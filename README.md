@@ -438,7 +438,7 @@ you can add the following attribute to your AndroidManifest.xml file:
     ...
     android:usesCleartextTraffic="true">
     ...
-    </application>
+</application>
 ```
 
 > **Note:** Please note that while this configuration allows communication with HTTP websites,
