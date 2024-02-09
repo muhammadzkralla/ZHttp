@@ -27,20 +27,20 @@ There are some useful settings you can customize in ZHttp. You can set default h
 To start using ZHttp, you should add the dependencies to your project :
 
 ```gradle
-// Add it in your root build.gradle at the end of repositories:
+// Add this part to your settings.gradle.kts :
 dependencyResolutionManagement {
        repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
        repositories {
             mavenCentral()
-            maven { url 'https://jitpack.io' }
+            maven("https://jitpack.io")
        }
 }
 ```
 
 ```gradle
-// Add the dependency:
+// Add this dependency to your build.gradle.kts (module) :
 dependencies {
-      implementation 'com.github.muhammadzkralla:ZHttp:v1.0'
+      implementation("com.github.muhammadzkralla:ZHttp:1.2")
 }
 ```
 
@@ -431,5 +431,17 @@ To make a synchronous `MULTIPART` request using ZHttp, here's an example of the 
 val response = ZMultipart(client).doRawMultipartRequest(COMPLETE_URL, PARTS, HEADERS)
 ```
 
+ZHttp supports both HTTP and HTTPS websites. To enable communication with HTTP websites,
+you can add the following attribute to your AndroidManifest.xml file:
+```xml
+<application
+    ...
+    android:usesCleartextTraffic="true">
+    ...
+    </application>
+```
 
+> **Note:** Please note that while this configuration allows communication with HTTP websites,
+> it is generally not recommended due to security concerns.
+> It's recommended to use HTTPS whenever possible to ensure data integrity and confidentiality during transit.
 
