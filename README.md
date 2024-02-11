@@ -5,7 +5,7 @@
 ZHttp is a Kotlin-based HTTP Client Library offering various use cases. I've abstracted away all the technical 
 details of making an asynchronous HTTP request, making it very easy to use and beginner-friendly. <br><br>
 This does not mean that you cannot customize your request. In fact, you can ignore all my threading and serialization/deserialization 
-logic and make a completely raw request, where you can handle reactive programming and the serialization process.
+logic and make a completely raw request, where you can handle reactive programming and the deserialization process.
 In manual mode, you take complete control over the whole process. <br> <br>
 ZHttp is not built on any high-level or low-level networking or threading libraries.
 The only third-party library used is Google's `Gson` library for serialization/deserialization. <br><br>
@@ -266,6 +266,9 @@ To make a `PATCH` request using ZHttp, here's an example of the syntax :
 val ARG = JsonObject().apply {
             addProperty("arg", "New Value!")
 }
+// Or you can do it as a data class if you don't want to use Gson:
+data class UpdateArg(val arg: Any? = null)
+val ARG = UpdateArg(arg = "New Value!")
 
 val patchRequest = client.patch(END_POINT, ARG, HEADERS, QUERIES, object : ZListener<RESPONSE_TYPE> {
             override fun onSuccess(response: Response<RESPONSE_TYPE>?) {
@@ -362,7 +365,7 @@ val badMultiPartBody = MultipartBody(
 As stated earlier, ZHttp is engineered for all developers, not just beginners, as it supports full customization for your HTTP request. 
 The manual mode is designed to make you take complete control over your HTTP request. <br> <br> The request made with manual mode is just 
 like using a manual car, you specify everything. You must handle the threading yourself using for example: Kotlin Coroutines / RxJava / AsyncTasks..etc 
-and handle response deserialization. <br> <br>
+and handle the response deserialization. <br> <br>
 An instance of the client is required in the manual mode as the base url, connection / read time out periods, default headers, and buffer size values are applied to the synchronous request too.
 
 > **Note:** All the synchronous functions are annotated with the `synchronized` annotation meaning that they are all thread-safe.
@@ -376,7 +379,7 @@ To make a synchronous `GET` request using ZHttp, here's an example of the syntax
 val response = ZGet(client).doGet(END_POINT, QUERIES, HEADERS)
 ```
 
-The `response` variable is a data class that contains the response code, the body as a raw string,
+The `response` variable is a data class that contains the response code, the serialized body as a raw string,
 response headers, permissions, and exceptions.
 Please remember that the body is the raw body string that is received from the HTTP request so,
 you need to deserialize the response yourself.
@@ -419,7 +422,11 @@ To make a synchronous `PATCH` request using ZHttp, here's an example of the synt
 // The syntax of a synchronous PATCH request.
 val ARG = JsonObject().apply {
                 addProperty("arg", "New Value!")
-}.toString()
+}
+// Or you can do it as a data class :
+data class UpdateArg(val arg: Any? = null)
+val ARG = UpdateArg(arg = "New Value!")
+
 val response = ZPatch(client).doPatch(END_POINT, QUERIES, ARG, HEADERS)
 ```
 
