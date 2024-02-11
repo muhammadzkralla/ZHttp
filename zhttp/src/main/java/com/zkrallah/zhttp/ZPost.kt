@@ -23,17 +23,22 @@ class ZPost(private val client: ZHttpClient) {
     /**
      * Executes a raw POST HTTP request synchronously.
      *
-     * @param urlString URL to send the POST request to.
+     * @param endpoint Endpoint to append to the base URL.
+     * @param queries List of query parameters to include in the URL.
      * @param requestBody Body of the request.
      * @param headers List of headers to include in the request.
      * @return HttpResponse containing the response details.
      */
     @Synchronized
     @Throws(Exception::class)
-    fun doRawPostRequest(
-        urlString: String, requestBody: String, headers: List<Header>?
+    fun <T> doPost(
+        endpoint: String, queries: List<Query>?, requestBody: T, headers: List<Header>?
     ): HttpResponse? {
-        val url = URL(urlString)
+        // Build the full URL with endpoint and query parameters
+        val urlString = StringBuilder(client.getBaseUrl()).append("/").append(endpoint)
+        UrlEncoderUtil.addQueryParameters(urlString, queries)
+
+        val url = URL(urlString.toString())
         val connection = url.openConnection() as HttpURLConnection
         connection.connectTimeout = client.getConnectionTimeout()
         connection.readTimeout = client.getReadTimeout()
@@ -53,9 +58,12 @@ class ZPost(private val client: ZHttpClient) {
                 }
             }
 
+            // Serialize the request body to JSON
+            val body = client.getGsonInstance().toJson(requestBody)
+
             // Write the request body to the output stream
             connection.outputStream.use { outputStream ->
-                outputStream.write(requestBody.toByteArray())
+                outputStream.write(body.toByteArray())
                 outputStream.flush()
             }
 
@@ -101,22 +109,24 @@ class ZPost(private val client: ZHttpClient) {
     /**
      * Executes a raw POST HTTP request asynchronously.
      *
-     * @param urlString URL to send the POST request to.
+     * @param endpoint Endpoint to append to the base URL.
+     * @param queries List of query parameters to include in the URL.
      * @param requestBody Body of the request.
      * @param headers List of headers to include in the request.
      * @return CompletableFuture that will be completed with the HttpResponse or an exception.
      */
-    private fun doAsyncPostRequest(
-        urlString: String, requestBody: String, headers: List<Header>?
+    private fun <T> doAsyncPostRequest(
+        endpoint: String, queries: List<Query>?, requestBody: T, headers: List<Header>?
     ): CompletableFuture<HttpResponse?>? {
         return CompletableFuture.supplyAsync {
             try {
                 // Perform the raw POST request
-                doRawPostRequest(urlString, requestBody, headers)
-                    ?: throw RuntimeException("Received null response for HTTP request to $urlString")
+                doPost(endpoint, queries, requestBody, headers) ?: throw RuntimeException(
+                    "Received null response for HTTP request to $endpoint"
+                )
             } catch (e: IOException) {
                 // If an IOException occurs, wrap it in a RuntimeException
-                throw RuntimeException("Error during HTTP request to $urlString", e)
+                throw RuntimeException("Error during HTTP request to $endpoint", e)
             }
         }.exceptionally { throwable ->
             // Handle exceptions during async execution
@@ -148,15 +158,8 @@ class ZPost(private val client: ZHttpClient) {
         type: Type,
         callback: ZListener<E>
     ): CompletableFuture<HttpResponse?>? {
-        // Serialize the request body to JSON
-        val body = client.getGsonInstance().toJson(requestBody)
-
-        // Build the full URL with endpoint and query parameters
-        val url = StringBuilder(client.getBaseUrl()).append("/").append(endpoint)
-        UrlEncoderUtil.addQueryParameters(url, queries)
-
         // Perform the async POST request
-        val futureResponse = doAsyncPostRequest(url.toString(), body, headers)
+        val futureResponse = doAsyncPostRequest(endpoint, queries, requestBody, headers)
 
         // Handle the response or exception when the CompletableFuture is complete
         futureResponse?.whenComplete { httpResponse, _ ->

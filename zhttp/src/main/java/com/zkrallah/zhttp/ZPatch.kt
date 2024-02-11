@@ -23,17 +23,22 @@ class ZPatch(private val client: ZHttpClient) {
     /**
      * Executes a raw PATCH HTTP request synchronously.
      *
-     * @param urlString URL to send the PATCH request to.
+     * @param endpoint Endpoint to append to the base URL.
+     * @param queries List of query parameters to include in the URL.
      * @param requestBody Body of the request.
      * @param headers List of headers to include in the request.
      * @return HttpResponse containing the response details.
      */
     @Synchronized
     @Throws(Exception::class)
-    fun doRawPatchRequest(
-        urlString: String, requestBody: String, headers: List<Header>?
+    fun <T> doPatch(
+        endpoint: String, queries: List<Query>?, requestBody: T, headers: List<Header>?
     ): HttpResponse? {
-        val url = URL(urlString)
+        // Build the full URL with endpoint and query parameters
+        val urlString = StringBuilder(client.getBaseUrl()).append("/").append(endpoint)
+        UrlEncoderUtil.addQueryParameters(urlString, queries)
+
+        val url = URL(urlString.toString())
         val connection = url.openConnection() as HttpURLConnection
         connection.connectTimeout = client.getConnectionTimeout()
         connection.readTimeout = client.getReadTimeout()
@@ -53,9 +58,12 @@ class ZPatch(private val client: ZHttpClient) {
                 }
             }
 
+            // Serialize the request body to JSON
+            val body = client.getGsonInstance().toJson(requestBody)
+
             // Write the request body to the output stream
             connection.outputStream.use { outputStream ->
-                outputStream.write(requestBody.toByteArray())
+                outputStream.write(body.toByteArray())
                 outputStream.flush()
             }
 
@@ -101,22 +109,23 @@ class ZPatch(private val client: ZHttpClient) {
     /**
      * Executes a raw PATCH HTTP request asynchronously.
      *
-     * @param urlString URL to send the PATCH request to.
+     * @param endpoint Endpoint to append to the base URL.
+     * @param queries List of query parameters to include in the URL.
      * @param requestBody Body of the request.
      * @param headers List of headers to include in the request.
      * @return CompletableFuture that will be completed with the HttpResponse or an exception.
      */
-    private fun doAsyncPatchRequest(
-        urlString: String, requestBody: String, headers: List<Header>?
+    private fun <T> doAsyncPatchRequest(
+        endpoint: String, queries: List<Query>?, requestBody: T, headers: List<Header>?
     ): CompletableFuture<HttpResponse?>? {
         return CompletableFuture.supplyAsync {
             try {
                 // Perform the raw PATCH request
-                doRawPatchRequest(urlString, requestBody, headers)
-                    ?: throw RuntimeException("Received null response for HTTP request to $urlString")
+                doPatch(endpoint, queries, requestBody, headers)
+                    ?: throw RuntimeException("Received null response for HTTP request to $endpoint")
             } catch (e: IOException) {
                 // If an IOException occurs, wrap it in a RuntimeException
-                throw RuntimeException("Error during HTTP request to $urlString", e)
+                throw RuntimeException("Error during HTTP request to $endpoint", e)
             }
         }.exceptionally { throwable ->
             // Handle exceptions during async execution
@@ -148,15 +157,9 @@ class ZPatch(private val client: ZHttpClient) {
         type: Type,
         callback: ZListener<E>
     ): CompletableFuture<HttpResponse?>? {
-        // Serialize the request body to JSON
-        val body = client.getGsonInstance().toJson(requestBody)
-
-        // Build the full URL with endpoint and query parameters
-        val url = StringBuilder(client.getBaseUrl()).append("/").append(endpoint)
-        UrlEncoderUtil.addQueryParameters(url, queries)
 
         // Perform the async PATCH request
-        val futureResponse = doAsyncPatchRequest(url.toString(), body, headers)
+        val futureResponse = doAsyncPatchRequest(endpoint, queries, requestBody, headers)
 
         // Handle the response or exception when the CompletableFuture is complete
         futureResponse?.thenAccept { httpResponse ->

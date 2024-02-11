@@ -23,14 +23,21 @@ class ZGet(private val client: ZHttpClient) {
     /**
      * Executes a raw GET HTTP request synchronously.
      *
-     * @param urlString URL to send the GET request to.
+     * @param endpoint Endpoint to append to the base URL.
+     * @param queries List of query parameters to include in the URL.
      * @param headers List of headers to include in the request.
      * @return HttpResponse containing the response details.
      */
     @Synchronized
     @Throws(Exception::class)
-    fun doRawGetRequest(urlString: String, headers: List<Header>?): HttpResponse? {
-        val url = URL(urlString)
+    fun doGet(
+        endpoint: String, queries: List<Query>?, headers: List<Header>?
+    ): HttpResponse? {
+        // Build the full URL with endpoint and query parameters
+        val urlString = StringBuilder(client.getBaseUrl()).append("/").append(endpoint)
+        UrlEncoderUtil.addQueryParameters(urlString, queries)
+
+        val url = URL(urlString.toString())
         val connection = url.openConnection() as HttpURLConnection
         connection.connectTimeout = client.getConnectionTimeout()
         connection.readTimeout = client.getReadTimeout()
@@ -91,21 +98,22 @@ class ZGet(private val client: ZHttpClient) {
     /**
      * Executes a raw GET HTTP request asynchronously.
      *
-     * @param urlString URL to send the GET request to.
+     * @param endpoint Endpoint to append to the base URL.
+     * @param queries List of query parameters to include in the URL.
      * @param headers List of headers to include in the request.
      * @return CompletableFuture that will be completed with the HttpResponse or an exception.
      */
     private fun doAsyncGetRequest(
-        urlString: String, headers: List<Header>?
+        endpoint: String, queries: List<Query>?, headers: List<Header>?
     ): CompletableFuture<HttpResponse?>? {
         return CompletableFuture.supplyAsync {
             try {
                 // Perform the raw GET request
-                doRawGetRequest(urlString, headers)
-                    ?: throw RuntimeException("Received null response for HTTP request to $urlString")
+                doGet(endpoint, queries, headers)
+                    ?: throw RuntimeException("Received null response for HTTP request to $endpoint")
             } catch (e: IOException) {
                 // If an IOException occurs, wrap it in a RuntimeException
-                throw RuntimeException("Error during HTTP request to $urlString", e)
+                throw RuntimeException("Error during HTTP request to $endpoint", e)
             }
         }.exceptionally { throwable ->
             // Handle exceptions during async execution
@@ -135,12 +143,8 @@ class ZGet(private val client: ZHttpClient) {
         type: Type,
         callback: ZListener<T>
     ): CompletableFuture<HttpResponse?>? {
-        // Build the full URL with endpoint and query parameters
-        val url = StringBuilder(client.getBaseUrl()).append("/").append(endpoint)
-        UrlEncoderUtil.addQueryParameters(url, queries)
-
         // Perform the async GET request
-        val futureResponse = doAsyncGetRequest(url.toString(), headers)
+        val futureResponse = doAsyncGetRequest(endpoint, queries, headers)
 
         // Handle the response or exception when the CompletableFuture is complete
         futureResponse?.whenComplete { httpResponse, _ ->
