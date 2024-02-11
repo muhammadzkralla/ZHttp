@@ -11,6 +11,7 @@ ZHttp is not built on any high-level or low-level networking or threading librar
 The only third-party library used is Google's `Gson` library for serialization/deserialization. <br><br>
 There are some useful settings you can customize in ZHttp. You can set default headers, connection and read time out periods, and buffer size for uploading files. 
 
+Refer to this [Demo](https://github.com/muhammadzkralla/ZHttp_Demo "Demo") for an example.
 
 ## Features
 
@@ -18,9 +19,9 @@ There are some useful settings you can customize in ZHttp. You can set default h
 • Thread-safe & type-safe <br>
 • Asynchronous/synchronous <br>
 • Handles serialization/deserialization <br>
-• Has cancelation strategy <br>
+• Has cancellation strategy <br>
 • Customizable <br>
-• Supports `GET`, `POST`, `DELETE`, `PUT`, `PATCH,` and `MULTIPART` requests <br> <br>
+• Supports `GET`, `POST`, `DELETE`, `PUT`, `PATCH`, and `MULTIPART` requests <br> <br>
 
 ## Installation
 
@@ -59,7 +60,7 @@ val client = ZHttpClient.Builder()
 
 ```
 
-You can also specifiy the connection and the read time out periods : <br> 
+You can also specify the connection and the read time out periods : <br> 
 
 ```kotlin
 // Setting the connection and the read time out periods to 20 seconds.
@@ -153,7 +154,7 @@ val getRequest = client.get(END_POINT, HEADERS, QUERIES, object : ZListener<RESP
 })
 ```
 
-The `response` argument is a data class that contains the response code, the serialized body,
+The `response` argument is a data class that contains the response code, the deserialized body,
 response headers, permissions, and exceptions of the HTTP request.
 
 > **IMPORTANT:** `RESPONSE_TYPE` is generic, that means that it can be of type string, data class, list of objects, map of any object to any object..etc It's totally type-safe.
@@ -360,11 +361,11 @@ val badMultiPartBody = MultipartBody(
 
 As stated earlier, ZHttp is engineered for all developers, not just beginners, as it supports full customization for your HTTP request. 
 The manual mode is designed to make you take complete control over your HTTP request. <br> <br> The request made with manual mode is just 
-like using a manual car, you specifiy everything. You must handle the threading yourself using for example: Kotlin Coroutines / RxJava / AsyncTasks..etc
-, serialization, deserialization, and pass the complete url on each request. <br> <br>
-An instance of the client is required in the manual mode as the connection / read time out periods, default headers, and buffer size values are applied to the synchronous request too.
+like using a manual car, you specify everything. You must handle the threading yourself using for example: Kotlin Coroutines / RxJava / AsyncTasks..etc 
+and handle response deserialization. <br> <br>
+An instance of the client is required in the manual mode as the base url, connection / read time out periods, default headers, and buffer size values are applied to the synchronous request too.
 
-> **Note:** All the synchronous functions are annotated with the `synchronized` annotaion meaning that they are all thread-safe.
+> **Note:** All the synchronous functions are annotated with the `synchronized` annotation meaning that they are all thread-safe.
 
 <h1 align = "center"> Synchronous GET </h1> <br>
 
@@ -372,11 +373,13 @@ To make a synchronous `GET` request using ZHttp, here's an example of the syntax
 
 ```kotlin
 // The syntax of a synchronous GET request.
-val response = ZGet(client).doRawGetRequest(COMPLETE_URL, HEADERS)
+val response = ZGet(client).doGet(END_POINT, QUERIES, HEADERS)
 ```
 
-The `response` variable is a data class that contains the response code, the unserialized body as a string,
-response headers, permissions, and exceptions. Please remember that the body is the raw body string that is received from the HTTP request.
+The `response` variable is a data class that contains the response code, the body as a raw string,
+response headers, permissions, and exceptions.
+Please remember that the body is the raw body string that is received from the HTTP request so,
+you need to deserialize the response yourself.
 
 > **Note:** The code above should not be called from the main thread, if you do so, an `android.os.NetworkOnMainThreadException`
 > will be thrown.
@@ -387,8 +390,7 @@ To make a synchronous `POST` request using ZHttp, here's an example of the synta
 
 ```kotlin
 // The syntax of a synchronous POST request.
-val obj = Gson().toJson(YOUR_OBJECT)
-val response = ZPost(client).doRawPostRequest(COMPLETE_URL, obj, HEADERS)
+val response = ZPost(client).doPost(END_POINT, QUERIES, BODY, HEADERS)
 ```
 
 <h1 align = "center"> Synchronous DELETE </h1> <br>
@@ -397,7 +399,7 @@ To make a synchronous `DELETE` request using ZHttp, here's an example of the syn
 
 ```kotlin
 // The syntax of a synchronous DELETE request.
-val response = ZDelete(client).doRawDeleteRequest(COMPLETE_URL, HEADERS)
+val response = ZDelete(client).doDelete(END_POINT, QUERIES, HEADERS)
 ```
 
 <h1 align = "center"> Synchronous PUT </h1> <br>
@@ -406,8 +408,7 @@ To make a synchronous `PUT` request using ZHttp, here's an example of the syntax
 
 ```kotlin
 // The syntax of a synchronous PUT request.
-val obj = Gson().toJson(YOUR_OBJECT)
-val response = ZPut(client).doRawPutRequest(COMPLETE_URL, obj, HEADERS)
+val response = ZPut(client).doPut(END_POINT, QUERIES, BODY, HEADERS)
 ```
 
 <h1 align = "center"> Synchronous PATCH </h1> <br>
@@ -419,7 +420,7 @@ To make a synchronous `PATCH` request using ZHttp, here's an example of the synt
 val ARG = JsonObject().apply {
                 addProperty("arg", "New Value!")
 }.toString()
-val response = ZPatch(client).doRawPatchRequest(COMPLETE_URL, ARG, HEADERS)
+val response = ZPatch(client).doPatch(END_POINT, QUERIES, ARG, HEADERS)
 ```
 
 <h1 align = "center"> Synchronous MULTIPART </h1> <br>
@@ -428,7 +429,7 @@ To make a synchronous `MULTIPART` request using ZHttp, here's an example of the 
 
 ```kotlin
 // The syntax of a synchronous MULTIPART request.
-val response = ZMultipart(client).doRawMultipartRequest(COMPLETE_URL, PARTS, HEADERS)
+val response = ZMultipart(client).doMultipart(END_POINT, QUERIES, PARTS, HEADERS)
 ```
 
 ZHttp supports both HTTP and HTTPS websites. To enable communication with HTTP websites,
