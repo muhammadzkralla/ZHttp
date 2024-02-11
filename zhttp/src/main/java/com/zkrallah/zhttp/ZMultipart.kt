@@ -26,17 +26,22 @@ class ZMultipart(private val client: ZHttpClient) {
     /**
      * Executes a raw multipart/form-data POST HTTP request synchronously.
      *
-     * @param urlString URL to send the POST request to.
+     * @param endpoint Endpoint to append to the base URL.
+     * @param queries List of query parameters to include in the URL.
      * @param parts List of MultipartBody parts to include in the request.
      * @param headers List of headers to include in the request.
      * @return HttpResponse containing the response details.
      */
     @Synchronized
     @Throws(Exception::class)
-    fun doRawMultipartRequest(
-        urlString: String, parts: List<MultipartBody>, headers: List<Header>?
+    fun doMultipart(
+        endpoint: String, queries: List<Query>?, parts: List<MultipartBody>, headers: List<Header>?
     ): HttpResponse? {
-        val url = URL(urlString)
+        // Build the full URL with endpoint and query parameters
+        val urlString = StringBuilder(client.getBaseUrl()).append("/").append(endpoint)
+        UrlEncoderUtil.addQueryParameters(urlString, queries)
+
+        val url = URL(urlString.toString())
         val connection = url.openConnection() as HttpURLConnection
         connection.connectTimeout = client.getConnectionTimeout()
         connection.readTimeout = client.getReadTimeout()
@@ -133,22 +138,23 @@ class ZMultipart(private val client: ZHttpClient) {
     /**
      * Executes a raw multipart/form-data POST HTTP request asynchronously.
      *
-     * @param urlString URL to send the POST request to.
+     * @param endpoint Endpoint to append to the base URL.
+     * @param queries List of query parameters to include in the URL.
      * @param parts List of MultipartBody parts to include in the request.
      * @param headers List of headers to include in the request.
      * @return CompletableFuture that will be completed with the HttpResponse or an exception.
      */
     private fun doAsyncMultipartRequest(
-        urlString: String, parts: List<MultipartBody>, headers: List<Header>?
+        endpoint: String, queries: List<Query>?, parts: List<MultipartBody>, headers: List<Header>?
     ): CompletableFuture<HttpResponse?>? {
         return CompletableFuture.supplyAsync {
             try {
                 // Perform the raw MULTIPART request
-                doRawMultipartRequest(urlString, parts, headers)
-                    ?: throw RuntimeException("Received null response for HTTP request to $urlString")
+                doMultipart(endpoint, queries, parts, headers)
+                    ?: throw RuntimeException("Received null response for HTTP request to $endpoint")
             } catch (e: IOException) {
                 // If an IOException occurs, wrap it in a RuntimeException
-                throw RuntimeException("Error during HTTP request to $urlString", e)
+                throw RuntimeException("Error during HTTP request to $endpoint", e)
             }
         }.exceptionally { throwable ->
             // Handle exceptions during async execution
@@ -180,12 +186,8 @@ class ZMultipart(private val client: ZHttpClient) {
         type: Type,
         callback: ZListener<T>
     ): CompletableFuture<HttpResponse?>? {
-        // Build the full URL with endpoint and query parameters
-        val url = StringBuilder(client.getBaseUrl()).append("/").append(endpoint)
-        UrlEncoderUtil.addQueryParameters(url, queries)
-
         // Perform the async MULTIPART request
-        val futureResponse = doAsyncMultipartRequest(url.toString(), parts, headers)
+        val futureResponse = doAsyncMultipartRequest(endpoint, queries, parts, headers)
 
         // Handle the response or exception when the CompletableFuture is complete
         futureResponse?.whenComplete { httpResponse, _ ->
