@@ -106,11 +106,11 @@ class ZMultipart(private val client: ZHttpClient) {
                 }
             } catch (e: SocketTimeoutException) {
                 // If a socket timeout occurs, return an HttpResponse with the exception
-                Log.e(TAG, "doRawMultipartRequest: $e", e)
+                Log.e(TAG, "doMultipart: $e", e)
                 return HttpResponse(exception = e)
             } catch (e: Exception) {
                 // If there's an error, read the error stream for additional information
-                Log.e(TAG, "doRawMultipartRequest: $e", e)
+                Log.e(TAG, "doMultipart: $e", e)
                 BufferedReader(InputStreamReader(connection.errorStream)).use { reader ->
                     var line: String?
                     while (reader.readLine().also { line = it } != null) response.append(line)
@@ -127,7 +127,7 @@ class ZMultipart(private val client: ZHttpClient) {
             )
         } catch (e: Exception) {
             // If an exception occurs, log the error and return an HttpResponse with the exception
-            Log.e(TAG, "doRawMultipartRequest: $e", e)
+            Log.e(TAG, "doMultipart: $e", e)
             HttpResponse(exception = e)
         } finally {
             // Disconnect the connection when done
