@@ -19,5 +19,6 @@ data class Response<T>(
     val headers: Map<String, List<String>>? = null,
     val raw: String? = null,
     val date: Long? = null,
-    val permission: Permission? = null
+    val permission: Permission? = null,
+    val exception: Exception? = null
 )

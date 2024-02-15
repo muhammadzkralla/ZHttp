@@ -2,6 +2,8 @@ package com.zkrallah.zhttp
 
 import android.os.Handler
 import android.os.Looper
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 /**
  * Helper function for calling the callback on the main thread.
@@ -25,6 +27,15 @@ object Helper {
             e?.let {
                 callback.onFailure(it)
             }
+        }
+    }
+
+    inline fun <reified T> Gson.fromJson(json: String?): T? {
+        return json?.let {
+            val type = object : TypeToken<T>() {}.type
+            this.fromJson(json, type)
+        } ?: run {
+            null
         }
     }
 }

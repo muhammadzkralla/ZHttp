@@ -68,7 +68,7 @@ class ZHttpClient private constructor(builder: Builder) {
      *
      * @return Gson instance.
      */
-    internal fun getGsonInstance(): Gson {
+    fun getGsonInstance(): Gson {
         return gson
     }
 
@@ -128,6 +128,14 @@ class ZHttpClient private constructor(builder: Builder) {
         return ZGet(this).processGet(
             endPoint, headers, queries, object : TypeToken<T>() {}.type, callback
         )
+    }
+
+    suspend inline fun <reified T> get(
+        endPoint: String,
+        headers: List<Header>?,
+        queries: List<Query>?
+    ): Response<T>? {
+        return ZGet(this).processGet(endPoint, queries, headers)
     }
 
     /**

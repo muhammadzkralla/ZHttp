@@ -3,6 +3,11 @@ package com.zkrallah.zhttp
 import android.util.Log
 import com.google.gson.JsonParseException
 import com.zkrallah.zhttp.Helper.callOnMainThread
+import com.zkrallah.zhttp.Helper.fromJson
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
@@ -18,7 +23,7 @@ import java.util.concurrent.CompletableFuture
  * @param client ZHttpClient instance of the client.
  */
 @Suppress("UNUSED", "UNCHECKED_CAST")
-class ZGet(private val client: ZHttpClient) {
+class ZGet(val client: ZHttpClient) {
 
     /**
      * Executes a raw GET HTTP request synchronously.
@@ -124,6 +129,56 @@ class ZGet(private val client: ZHttpClient) {
                 throw throwable
             }
         }
+    }
+
+    suspend fun doSuspendedGetRequest(
+        endpoint: String, queries: List<Query>?, headers: List<Header>?
+    ): Deferred<HttpResponse?> {
+        return withContext(Dispatchers.IO) {
+            async {
+                try {
+                    doGet(endpoint, queries, headers)
+                } catch (e: Exception) {
+                    Log.e(TAG, "doSuspendedGetRequest: $e", e)
+                    val response = HttpResponse(exception = e)
+                    response
+                }
+            }
+        }
+    }
+
+    inline fun <reified T> deserializeBody(body: String?): T? {
+        return try {
+            client.getGsonInstance().fromJson<T>(body)
+        } catch (e: JsonParseException) {
+            if (T::class.java == String::class.java) body as T
+            else null
+        } catch (e: Exception) {
+            Log.e("ZGet", "deserializeBody: $e", e)
+            null
+        }
+    }
+
+    suspend inline fun <reified T> processGet(
+        endpoint: String, queries: List<Query>?, headers: List<Header>?
+    ): Response<T>? {
+        val response = doSuspendedGetRequest(endpoint, queries, headers).await() ?: return null
+
+        response.exception?.let {
+            Log.e("ZGet", "processGet: $it", it)
+        }
+
+        val body = deserializeBody<T>(response.body)
+
+        return Response(
+            code = response.code,
+            body = body,
+            headers = response.headers,
+            raw = response.body,
+            date = response.date,
+            permission = response.permission,
+            exception = response.exception
+        )
     }
 
     /**
