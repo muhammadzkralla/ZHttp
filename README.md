@@ -271,7 +271,7 @@ To make a suspended `PUT` request using ZHttp, here's an example of the syntax :
 
 ```kotlin
 // The syntax of a PUT request.
-val response = storeClient.put<ShopItem>("products/$id", product, null, null)
+val response = storeClient.put<ShopItem>(END_POINT", BODY, QUERIES, HEADERS)
 ```
 
 It will return you a `response` of the specified `RESPONSE_TYPE`
@@ -304,7 +304,6 @@ val putRequest = client.put(END_POINT, BODY, QUERIES, HEADERS, object : ZListene
 To make a suspended `PATCH` request using ZHttp, here's an example of the syntax :
 
 ```kotlin
-// The syntax of a PATCH request.
 // The syntax of a PATCH request.
 val ARG = JsonObject().apply {
             addProperty("arg", "New Value!")
