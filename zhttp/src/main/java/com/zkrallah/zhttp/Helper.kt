@@ -2,7 +2,9 @@ package com.zkrallah.zhttp
 
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import com.google.gson.Gson
+import com.google.gson.JsonParseException
 import com.google.gson.reflect.TypeToken
 
 /**
@@ -35,6 +37,18 @@ object Helper {
             val type = object : TypeToken<T>() {}.type
             this.fromJson(json, type)
         } ?: run {
+            null
+        }
+    }
+
+    inline fun <reified T> Gson.deserializeBody(body: String?): T? {
+        return try {
+            this.fromJson<T>(body)
+        } catch (e: JsonParseException) {
+            if (T::class.java == String::class.java) body as T
+            else null
+        } catch (e: Exception) {
+            Log.e("ZGet", "deserializeBody: $e", e)
             null
         }
     }

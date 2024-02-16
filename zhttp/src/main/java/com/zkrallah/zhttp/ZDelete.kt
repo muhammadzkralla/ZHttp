@@ -3,6 +3,11 @@ package com.zkrallah.zhttp
 import android.util.Log
 import com.google.gson.JsonParseException
 import com.zkrallah.zhttp.Helper.callOnMainThread
+import com.zkrallah.zhttp.Helper.deserializeBody
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
@@ -18,7 +23,7 @@ import java.util.concurrent.CompletableFuture
  * @param client ZHttpClient instance of the client.
  */
 @Suppress("UNUSED", "UNCHECKED_CAST")
-class ZDelete(private val client: ZHttpClient) {
+class ZDelete(val client: ZHttpClient) {
 
     /**
      * Executes a raw DELETE HTTP request synchronously.
@@ -124,6 +129,44 @@ class ZDelete(private val client: ZHttpClient) {
                 throw throwable
             }
         }
+    }
+
+    suspend fun doSuspendedDeleteRequest(
+        endpoint: String, queries: List<Query>?, headers: List<Header>?
+    ): Deferred<HttpResponse?> {
+        return withContext(Dispatchers.IO) {
+            async {
+                try {
+                    doDelete(endpoint, queries, headers)
+                } catch (e: Exception) {
+                    Log.e(TAG, "doSuspendedDeleteRequest: $e", e)
+                    val response = HttpResponse(exception = e)
+                    response
+                }
+            }
+        }
+    }
+
+    suspend inline fun <reified T> processDelete(
+        endpoint: String, queries: List<Query>?, headers: List<Header>?
+    ): Response<T>? {
+        val response = doSuspendedDeleteRequest(endpoint, queries, headers).await() ?: return null
+
+        response.exception?.let {
+            Log.e("ZDelete", "processDelete: $it", it)
+        }
+
+        val body = client.getGsonInstance().deserializeBody<T>(response.body)
+
+        return Response(
+            code = response.code,
+            body = body,
+            headers = response.headers,
+            raw = response.body,
+            date = response.date,
+            permission = response.permission,
+            exception = response.exception
+        )
     }
 
     /**

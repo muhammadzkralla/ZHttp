@@ -226,6 +226,13 @@ class ZHttpClient private constructor(builder: Builder) {
         )
     }
 
+    suspend inline fun <reified T> delete(
+        endPoint: String,
+        headers: List<Header>?,
+        queries: List<Query>?,
+    ): Response<T>? {
+        return ZDelete(this).processDelete(endPoint, queries, headers)
+    }
     /**
      * Initiate a PUT request asynchronously.
      *

@@ -3,7 +3,7 @@ package com.zkrallah.zhttp
 import android.util.Log
 import com.google.gson.JsonParseException
 import com.zkrallah.zhttp.Helper.callOnMainThread
-import com.zkrallah.zhttp.Helper.fromJson
+import com.zkrallah.zhttp.Helper.deserializeBody
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -147,18 +147,6 @@ class ZGet(val client: ZHttpClient) {
         }
     }
 
-    inline fun <reified T> deserializeBody(body: String?): T? {
-        return try {
-            client.getGsonInstance().fromJson<T>(body)
-        } catch (e: JsonParseException) {
-            if (T::class.java == String::class.java) body as T
-            else null
-        } catch (e: Exception) {
-            Log.e("ZGet", "deserializeBody: $e", e)
-            null
-        }
-    }
-
     suspend inline fun <reified T> processGet(
         endpoint: String, queries: List<Query>?, headers: List<Header>?
     ): Response<T>? {
@@ -168,7 +156,7 @@ class ZGet(val client: ZHttpClient) {
             Log.e("ZGet", "processGet: $it", it)
         }
 
-        val body = deserializeBody<T>(response.body)
+        val body = client.getGsonInstance().deserializeBody<T>(response.body)
 
         return Response(
             code = response.code,
