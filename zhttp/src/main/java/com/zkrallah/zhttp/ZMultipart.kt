@@ -32,15 +32,15 @@ class ZMultipart(val client: ZHttpClient) {
      * Executes a raw multipart/form-data POST HTTP request synchronously.
      *
      * @param endpoint Endpoint to append to the base URL.
-     * @param queries List of query parameters to include in the URL.
      * @param parts List of MultipartBody parts to include in the request.
+     * @param queries List of query parameters to include in the URL.
      * @param headers List of headers to include in the request.
      * @return HttpResponse containing the response details.
      */
     @Synchronized
     @Throws(Exception::class)
     fun doMultipart(
-        endpoint: String, queries: List<Query>?, parts: List<MultipartBody>, headers: List<Header>?
+        endpoint: String, parts: List<MultipartBody>, queries: List<Query>?, headers: List<Header>?
     ): HttpResponse? {
         // Build the full URL with endpoint and query parameters
         val urlString = StringBuilder(client.getBaseUrl()).append("/").append(endpoint)
@@ -144,18 +144,18 @@ class ZMultipart(val client: ZHttpClient) {
      * Performs a suspended multipart HTTP request asynchronously, returning a [Deferred] object containing the result.
      *
      * @param endpoint The endpoint URL to send the multipart request to.
-     * @param queries The list of query parameters to include in the request.
      * @param parts The list of multipart parts to include in the request.
+     * @param queries The list of query parameters to include in the request.
      * @param headers The list of headers to include in the request.
      * @return A [Deferred] object containing the result of the multipart request.
      */
     suspend fun doSuspendedMultipartRequest(
-        endpoint: String, queries: List<Query>?, parts: List<MultipartBody>, headers: List<Header>?
+        endpoint: String, parts: List<MultipartBody>, queries: List<Query>?, headers: List<Header>?
     ): Deferred<HttpResponse?> {
         return withContext(Dispatchers.IO) {
             async {
                 try {
-                    doMultipart(endpoint, queries, parts, headers)
+                    doMultipart(endpoint, parts, queries, headers)
                 } catch (e: Exception) {
                     Log.e(TAG, "doSuspendedMultipartRequest: $e", e)
                     val response = HttpResponse(exception = e)
@@ -169,15 +169,16 @@ class ZMultipart(val client: ZHttpClient) {
      * Processes a multipart HTTP request asynchronously.
      *
      * @param endpoint The endpoint URL to send the multipart request to.
-     * @param queries The list of query parameters to include in the request.
      * @param parts The list of multipart parts to include in the request.
+     * @param queries The list of query parameters to include in the request.
      * @param headers The list of headers to include in the request.
      * @return A [Response] object containing the result of the multipart request, or `null` if an error occurs.
      */
     suspend inline fun <reified T> processMultiPart(
-        endpoint: String, queries: List<Query>?, parts: List<MultipartBody>, headers: List<Header>?
+        endpoint: String, parts: List<MultipartBody>, queries: List<Query>?, headers: List<Header>?
     ): Response<T>? {
-        val response = doSuspendedMultipartRequest(endpoint, queries, parts, headers).await() ?: return null
+        val response =
+            doSuspendedMultipartRequest(endpoint, parts, queries, headers).await() ?: return null
 
         response.exception?.let {
             Log.e("ZMultipart", "processMultiPart: $it", it)
@@ -200,18 +201,18 @@ class ZMultipart(val client: ZHttpClient) {
      * Executes a raw multipart/form-data POST HTTP request asynchronously.
      *
      * @param endpoint Endpoint to append to the base URL.
-     * @param queries List of query parameters to include in the URL.
      * @param parts List of MultipartBody parts to include in the request.
+     * @param queries List of query parameters to include in the URL.
      * @param headers List of headers to include in the request.
      * @return CompletableFuture that will be completed with the HttpResponse or an exception.
      */
     private fun doAsyncMultipartRequest(
-        endpoint: String, queries: List<Query>?, parts: List<MultipartBody>, headers: List<Header>?
+        endpoint: String, parts: List<MultipartBody>, queries: List<Query>?, headers: List<Header>?
     ): CompletableFuture<HttpResponse?>? {
         return CompletableFuture.supplyAsync {
             try {
                 // Perform the raw MULTIPART request
-                doMultipart(endpoint, queries, parts, headers)
+                doMultipart(endpoint, parts, queries, headers)
                     ?: throw RuntimeException("Received null response for HTTP request to $endpoint")
             } catch (e: IOException) {
                 // If an IOException occurs, wrap it in a RuntimeException
@@ -233,8 +234,8 @@ class ZMultipart(val client: ZHttpClient) {
      *
      * @param endpoint Endpoint to append to the base URL.
      * @param parts List of MultipartBody parts to include in the request.
-     * @param headers List of headers to include in the request.
      * @param queries List of query parameters to include in the URL.
+     * @param headers List of headers to include in the request.
      * @param type Type of the response body.
      * @param callback Callback to handle the HttpResponse or an exception.
      * @return CompletableFuture that will be completed with the HttpResponse or an exception.
@@ -242,13 +243,13 @@ class ZMultipart(val client: ZHttpClient) {
     fun <T> processMultiPart(
         endpoint: String,
         parts: List<MultipartBody>,
-        headers: List<Header>?,
         queries: List<Query>?,
+        headers: List<Header>?,
         type: Type,
         callback: ZListener<T>
     ): CompletableFuture<HttpResponse?>? {
         // Perform the async MULTIPART request
-        val futureResponse = doAsyncMultipartRequest(endpoint, queries, parts, headers)
+        val futureResponse = doAsyncMultipartRequest(endpoint, parts, queries, headers)
 
         // Handle the response or exception when the CompletableFuture is complete
         futureResponse?.whenComplete { httpResponse, _ ->
