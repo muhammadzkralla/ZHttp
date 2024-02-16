@@ -143,6 +143,15 @@ class ZPut(val client: ZHttpClient) {
         }
     }
 
+    /**
+     * Performs a suspended PUT HTTP request asynchronously, returning a [Deferred] object containing the result.
+     *
+     * @param endpoint The endpoint URL to send the PUT request to.
+     * @param queries The list of query parameters to include in the request.
+     * @param requestBody The request body to include in the PUT request.
+     * @param headers The list of headers to include in the request.
+     * @return A [Deferred] object containing the result of the PUT request.
+     */
     suspend fun doSuspendedPutRequest(
         endpoint: String, queries: List<Query>?, requestBody: Any, headers: List<Header>?
     ): Deferred<HttpResponse?> {
@@ -159,6 +168,15 @@ class ZPut(val client: ZHttpClient) {
         }
     }
 
+    /**
+     * Processes a PUT HTTP request asynchronously.
+     *
+     * @param endpoint The endpoint URL to send the PUT request to.
+     * @param queries The list of query parameters to include in the request.
+     * @param requestBody The request body to include in the PUT request.
+     * @param headers The list of headers to include in the request.
+     * @return A [Response] object containing the result of the PUT request, or `null` if an error occurs.
+     */
     suspend inline fun <reified T> processPut(
         endpoint: String, queries: List<Query>?, requestBody: Any, headers: List<Header>?
     ): Response<T>? {

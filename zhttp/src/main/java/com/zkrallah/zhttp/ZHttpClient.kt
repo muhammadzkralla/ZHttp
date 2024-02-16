@@ -130,12 +130,20 @@ class ZHttpClient private constructor(builder: Builder) {
         )
     }
 
+    /**
+     * Performs a GET HTTP request asynchronously, returning a [Response] object containing the result.
+     *
+     * @param endpoint The endpoint URL to send the GET request to.
+     * @param queries The list of query parameters to include in the URL.
+     * @param headers The list of headers to include in the request.
+     * @return A [Response] object containing the result of the GET request, or `null` if an error occurs.
+     */
     suspend inline fun <reified T> get(
-        endPoint: String,
-        headers: List<Header>?,
-        queries: List<Query>?
+        endpoint: String,
+        queries: List<Query>?,
+        headers: List<Header>?
     ): Response<T>? {
-        return ZGet(this).processGet(endPoint, queries, headers)
+        return ZGet(this).processGet(endpoint, queries, headers)
     }
 
     /**
@@ -184,11 +192,20 @@ class ZHttpClient private constructor(builder: Builder) {
         )
     }
 
+    /**
+     * Performs a POST HTTP request asynchronously, returning a [Response] object containing the result.
+     *
+     * @param endpoint The endpoint URL to send the POST request to.
+     * @param body The request body to include in the POST request.
+     * @param queries The list of query parameters to include in the URL.
+     * @param headers The list of headers to include in the request.
+     * @return A [Response] object containing the result of the POST request, or `null` if an error occurs.
+     */
     suspend inline fun <reified T> post (
         endpoint: String,
         body: Any,
-        headers: List<Header>?,
         queries: List<Query>?,
+        headers: List<Header>?
     ): Response<T>? {
         return ZPost(this).processPost(endpoint, queries, body, headers)
     }
@@ -235,12 +252,20 @@ class ZHttpClient private constructor(builder: Builder) {
         )
     }
 
+    /**
+     * Performs a DELETE HTTP request asynchronously, returning a [Response] object containing the result.
+     *
+     * @param endpoint The endpoint URL to send the DELETE request to.
+     * @param queries The list of query parameters to include in the URL.
+     * @param headers The list of headers to include in the request.
+     * @return A [Response] object containing the result of the DELETE request, or `null` if an error occurs.
+     */
     suspend inline fun <reified T> delete(
-        endPoint: String,
-        headers: List<Header>?,
+        endpoint: String,
         queries: List<Query>?,
+        headers: List<Header>?
     ): Response<T>? {
-        return ZDelete(this).processDelete(endPoint, queries, headers)
+        return ZDelete(this).processDelete(endpoint, queries, headers)
     }
     /**
      * Initiate a PUT request asynchronously.
@@ -288,11 +313,20 @@ class ZHttpClient private constructor(builder: Builder) {
         )
     }
 
+    /**
+     * Performs a PUT HTTP request asynchronously, returning a [Response] object containing the result.
+     *
+     * @param endpoint The endpoint URL to send the PUT request to.
+     * @param body The request body to be sent.
+     * @param queries The list of query parameters to include in the URL.
+     * @param headers The list of headers to include in the request.
+     * @return A [Response] object containing the result of the PUT request, or `null` if an error occurs.
+     */
     suspend inline fun <reified T> put(
         endpoint: String,
         body: Any,
-        headers: List<Header>?,
         queries: List<Query>?,
+        headers: List<Header>?
     ): Response<T>? {
         return ZPut(this).processPut(endpoint, queries, body, headers)
     }
@@ -343,11 +377,20 @@ class ZHttpClient private constructor(builder: Builder) {
         )
     }
 
+    /**
+     * Performs a PATCH HTTP request asynchronously, returning a [Response] object containing the result.
+     *
+     * @param endpoint The endpoint URL to send the PATCH request to.
+     * @param body The request body to be sent.
+     * @param queries The list of query parameters to include in the URL.
+     * @param headers The list of headers to include in the request.
+     * @return A [Response] object containing the result of the PATCH request, or `null` if an error occurs.
+     */
     suspend inline fun <reified T> patch(
         endpoint: String,
         body: Any,
-        headers: List<Header>?,
         queries: List<Query>?,
+        headers: List<Header>?
     ): Response<T>? {
         return ZPatch(this).processPatch(endpoint, queries, body, headers)
     }
@@ -398,11 +441,20 @@ class ZHttpClient private constructor(builder: Builder) {
         )
     }
 
+    /**
+     * Performs a multi-part HTTP request asynchronously, returning a [Response] object containing the result.
+     *
+     * @param endpoint The endpoint URL to send the multi-part request to.
+     * @param parts The list of multi-part body parts to be included in the request.
+     * @param queries The list of query parameters to include in the URL.
+     * @param headers The list of headers to include in the request.
+     * @return A [Response] object containing the result of the multi-part request, or `null` if an error occurs.
+     */
     suspend inline fun <reified T> multiPart(
         endpoint: String,
         parts: List<MultipartBody>,
-        headers: List<Header>?,
         queries: List<Query>?,
+        headers: List<Header>?
     ): Response<T>? {
         return ZMultipart(this).processMultiPart(endpoint, queries, parts, headers)
     }

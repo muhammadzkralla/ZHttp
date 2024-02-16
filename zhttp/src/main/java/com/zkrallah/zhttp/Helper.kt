@@ -32,6 +32,12 @@ object Helper {
         }
     }
 
+    /**
+     * Deserializes the specified JSON string into an object of the specified type [T].
+     *
+     * @param json The JSON string to deserialize.
+     * @return The deserialized object of type [T], or `null` if the JSON string is `null`.
+     */
     inline fun <reified T> Gson.fromJson(json: String?): T? {
         return json?.let {
             val type = object : TypeToken<T>() {}.type
@@ -41,6 +47,12 @@ object Helper {
         }
     }
 
+    /**
+     * Deserializes the specified JSON string into an object of the specified type [T].
+     *
+     * @param body The JSON string to deserialize.
+     * @return The deserialized object of type [T], or `null` if an error occurs during deserialization.
+     */
     inline fun <reified T> Gson.deserializeBody(body: String?): T? {
         return try {
             this.fromJson<T>(body)
@@ -48,7 +60,7 @@ object Helper {
             if (T::class.java == String::class.java) body as T
             else null
         } catch (e: Exception) {
-            Log.e("ZGet", "deserializeBody: $e", e)
+            Log.e("ZHttp", "deserializeBody: $e", e)
             null
         }
     }

@@ -140,6 +140,15 @@ class ZMultipart(val client: ZHttpClient) {
         }
     }
 
+    /**
+     * Performs a suspended multipart HTTP request asynchronously, returning a [Deferred] object containing the result.
+     *
+     * @param endpoint The endpoint URL to send the multipart request to.
+     * @param queries The list of query parameters to include in the request.
+     * @param parts The list of multipart parts to include in the request.
+     * @param headers The list of headers to include in the request.
+     * @return A [Deferred] object containing the result of the multipart request.
+     */
     suspend fun doSuspendedMultipartRequest(
         endpoint: String, queries: List<Query>?, parts: List<MultipartBody>, headers: List<Header>?
     ): Deferred<HttpResponse?> {
@@ -156,6 +165,15 @@ class ZMultipart(val client: ZHttpClient) {
         }
     }
 
+    /**
+     * Processes a multipart HTTP request asynchronously.
+     *
+     * @param endpoint The endpoint URL to send the multipart request to.
+     * @param queries The list of query parameters to include in the request.
+     * @param parts The list of multipart parts to include in the request.
+     * @param headers The list of headers to include in the request.
+     * @return A [Response] object containing the result of the multipart request, or `null` if an error occurs.
+     */
     suspend inline fun <reified T> processMultiPart(
         endpoint: String, queries: List<Query>?, parts: List<MultipartBody>, headers: List<Header>?
     ): Response<T>? {

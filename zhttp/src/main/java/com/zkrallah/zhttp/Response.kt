@@ -11,6 +11,7 @@ import java.security.Permission
  * @property raw The raw content of the HTTP response as a String.
  * @property date The date of the HTTP response, if available.
  * @property permission Represents the permission associated with the HTTP response, if applicable.
+ * @property exception The exception happened during the process.
  * @param T The type of the body content.
  */
 data class Response<T>(

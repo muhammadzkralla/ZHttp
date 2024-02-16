@@ -131,6 +131,14 @@ class ZDelete(val client: ZHttpClient) {
         }
     }
 
+    /**
+     * Performs a suspended DELETE HTTP request asynchronously, returning a [Deferred] object containing the result.
+     *
+     * @param endpoint The endpoint URL to send the DELETE request to.
+     * @param queries The list of query parameters to include in the request.
+     * @param headers The list of headers to include in the request.
+     * @return A [Deferred] object containing the result of the DELETE request.
+     */
     suspend fun doSuspendedDeleteRequest(
         endpoint: String, queries: List<Query>?, headers: List<Header>?
     ): Deferred<HttpResponse?> {
@@ -147,6 +155,14 @@ class ZDelete(val client: ZHttpClient) {
         }
     }
 
+    /**
+     * Processes a DELETE HTTP request asynchronously.
+     *
+     * @param endpoint The endpoint URL to send the DELETE request to.
+     * @param queries The list of query parameters to include in the request.
+     * @param headers The list of headers to include in the request.
+     * @return A [Response] object containing the result of the DELETE request, or `null` if an error occurs.
+     */
     suspend inline fun <reified T> processDelete(
         endpoint: String, queries: List<Query>?, headers: List<Header>?
     ): Response<T>? {

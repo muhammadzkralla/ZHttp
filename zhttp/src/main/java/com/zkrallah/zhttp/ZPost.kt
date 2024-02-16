@@ -144,6 +144,15 @@ class ZPost(val client: ZHttpClient) {
         }
     }
 
+    /**
+     * Performs a suspended POST HTTP request asynchronously, returning a [Deferred] object containing the result.
+     *
+     * @param endpoint The endpoint URL to send the POST request to.
+     * @param queries The list of query parameters to include in the request.
+     * @param requestBody The request body to include in the POST request.
+     * @param headers The list of headers to include in the request.
+     * @return A [Deferred] object containing the result of the POST request.
+     */
     suspend fun doSuspendedPostRequest(
         endpoint: String, queries: List<Query>?, requestBody: Any, headers: List<Header>?
     ): Deferred<HttpResponse?> {
@@ -160,6 +169,15 @@ class ZPost(val client: ZHttpClient) {
         }
     }
 
+    /**
+     * Processes a POST HTTP request asynchronously.
+     *
+     * @param endpoint The endpoint URL to send the POST request to.
+     * @param queries The list of query parameters to include in the request.
+     * @param requestBody The request body to include in the POST request.
+     * @param headers The list of headers to include in the request.
+     * @return A [Response] object containing the result of the POST request, or `null` if an error occurs.
+     */
     suspend inline fun <reified T> processPost(
         endpoint: String, queries: List<Query>?, requestBody: Any, headers: List<Header>?
     ): Response<T>? {

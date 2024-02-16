@@ -131,6 +131,14 @@ class ZGet(val client: ZHttpClient) {
         }
     }
 
+    /**
+     * Performs a suspended GET HTTP request asynchronously, returning a [Deferred] object containing the result.
+     *
+     * @param endpoint The endpoint URL to send the GET request to.
+     * @param queries The list of query parameters to include in the request.
+     * @param headers The list of headers to include in the request.
+     * @return A [Deferred] object containing the result of the GET request.
+     */
     suspend fun doSuspendedGetRequest(
         endpoint: String, queries: List<Query>?, headers: List<Header>?
     ): Deferred<HttpResponse?> {
@@ -147,6 +155,14 @@ class ZGet(val client: ZHttpClient) {
         }
     }
 
+    /**
+     * Processes a GET HTTP request asynchronously.
+     *
+     * @param endpoint The endpoint URL to send the GET request to.
+     * @param queries The list of query parameters to include in the request.
+     * @param headers The list of headers to include in the request.
+     * @return A [Response] object containing the result of the GET request, or `null` if an error occurs.
+     */
     suspend inline fun <reified T> processGet(
         endpoint: String, queries: List<Query>?, headers: List<Header>?
     ): Response<T>? {
