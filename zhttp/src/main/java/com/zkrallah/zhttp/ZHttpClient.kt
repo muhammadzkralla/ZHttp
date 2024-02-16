@@ -91,42 +91,39 @@ class ZHttpClient private constructor(builder: Builder) {
     /**
      * Initiate a GET request asynchronously.
      *
-     * @param endPoint Endpoint to append to the base URL.
-     * @param headers List of headers for the request.
+     * @param endpoint Endpoint to append to the base URL.
      * @param queries List of query parameters to include in the URL.
+     * @param headers List of headers for the request.
      * @param typeToken TypeToken for Gson deserialization.
      * @param callback Callback for handling the HTTP response.
      * @return CompletableFuture for the HTTP response or null.
      */
     fun <T> get(
-        endPoint: String,
-        headers: List<Header>?,
+        endpoint: String,
         queries: List<Query>?,
+        headers: List<Header>?,
         typeToken: TypeToken<T>,
         callback: ZListener<T>
     ): CompletableFuture<HttpResponse?>? {
         return ZGet(this).processGet(
-            endPoint, headers, queries, typeToken.type, callback
+            endpoint, queries, headers, typeToken.type, callback
         )
     }
 
     /**
      * Initiate a GET request asynchronously with reified type parameter.
      *
-     * @param endPoint Endpoint to append to the base URL.
-     * @param headers List of headers for the request.
+     * @param endpoint Endpoint to append to the base URL.
      * @param queries List of query parameters to include in the URL.
+     * @param headers List of headers for the request.
      * @param callback Callback for handling the HTTP response.
      * @return CompletableFuture for the HTTP response or null.
      */
     inline fun <reified T> get(
-        endPoint: String,
-        headers: List<Header>?,
-        queries: List<Query>?,
-        callback: ZListener<T>
+        endpoint: String, queries: List<Query>?, headers: List<Header>?, callback: ZListener<T>
     ): CompletableFuture<HttpResponse?>? {
         return ZGet(this).processGet(
-            endPoint, headers, queries, object : TypeToken<T>() {}.type, callback
+            endpoint, queries, headers, object : TypeToken<T>() {}.type, callback
         )
     }
 
@@ -139,9 +136,7 @@ class ZHttpClient private constructor(builder: Builder) {
      * @return A [Response] object containing the result of the GET request, or `null` if an error occurs.
      */
     suspend inline fun <reified T> get(
-        endpoint: String,
-        queries: List<Query>?,
-        headers: List<Header>?
+        endpoint: String, queries: List<Query>?, headers: List<Header>?
     ): Response<T>? {
         return ZGet(this).processGet(endpoint, queries, headers)
     }
@@ -151,22 +146,22 @@ class ZHttpClient private constructor(builder: Builder) {
      *
      * @param endpoint Endpoint to append to the base URL.
      * @param body Request body.
-     * @param headers List of headers for the request.
      * @param queries List of query parameters to include in the URL.
+     * @param headers List of headers for the request.
      * @param typeToken TypeToken for Gson deserialization.
      * @param callback Callback for handling the HTTP response.
      * @return CompletableFuture for the HTTP response or null.
      */
-    fun <T, E> post(
+    fun <T> post(
         endpoint: String,
-        body: T,
-        headers: List<Header>?,
+        body: Any,
         queries: List<Query>?,
-        typeToken: TypeToken<E>,
-        callback: ZListener<E>
+        headers: List<Header>?,
+        typeToken: TypeToken<T>,
+        callback: ZListener<T>
     ): CompletableFuture<HttpResponse?>? {
         return ZPost(this).processPost(
-            endpoint, body, headers, queries, typeToken.type, callback
+            endpoint, body, queries, headers, typeToken.type, callback
         )
     }
 
@@ -175,20 +170,20 @@ class ZHttpClient private constructor(builder: Builder) {
      *
      * @param endpoint Endpoint to append to the base URL.
      * @param body Request body.
-     * @param headers List of headers for the request.
      * @param queries List of query parameters to include in the URL.
+     * @param headers List of headers for the request.
      * @param callback Callback for handling the HTTP response.
      * @return CompletableFuture for the HTTP response or null.
      */
-    inline fun <T, reified E> post(
+    inline fun <reified T> post(
         endpoint: String,
-        body: T,
-        headers: List<Header>?,
+        body: Any,
         queries: List<Query>?,
-        callback: ZListener<E>
+        headers: List<Header>?,
+        callback: ZListener<T>
     ): CompletableFuture<HttpResponse?>? {
         return ZPost(this).processPost(
-            endpoint, body, headers, queries, object : TypeToken<E>() {}.type, callback
+            endpoint, body, queries, headers, object : TypeToken<T>() {}.type, callback
         )
     }
 
@@ -201,54 +196,48 @@ class ZHttpClient private constructor(builder: Builder) {
      * @param headers The list of headers to include in the request.
      * @return A [Response] object containing the result of the POST request, or `null` if an error occurs.
      */
-    suspend inline fun <reified T> post (
-        endpoint: String,
-        body: Any,
-        queries: List<Query>?,
-        headers: List<Header>?
+    suspend inline fun <reified T> post(
+        endpoint: String, body: Any, queries: List<Query>?, headers: List<Header>?
     ): Response<T>? {
-        return ZPost(this).processPost(endpoint, queries, body, headers)
+        return ZPost(this).processPost(endpoint, body, queries, headers)
     }
 
     /**
      * Initiate a DELETE request asynchronously.
      *
-     * @param endPoint Endpoint to append to the base URL.
-     * @param headers List of headers for the request.
+     * @param endpoint Endpoint to append to the base URL.
      * @param queries List of query parameters to include in the URL.
+     * @param headers List of headers for the request.
      * @param typeToken TypeToken for Gson deserialization.
      * @param callback Callback for handling the HTTP response.
      * @return CompletableFuture for the HTTP response or null.
      */
     fun <T> delete(
-        endPoint: String,
-        headers: List<Header>?,
+        endpoint: String,
         queries: List<Query>?,
+        headers: List<Header>?,
         typeToken: TypeToken<T>,
         callback: ZListener<T>
     ): CompletableFuture<HttpResponse?>? {
         return ZDelete(this).processDelete(
-            endPoint, headers, queries, typeToken.type, callback
+            endpoint, queries, headers, typeToken.type, callback
         )
     }
 
     /**
      * Initiate a DELETE request asynchronously with reified type parameter.
      *
-     * @param endPoint Endpoint to append to the base URL.
-     * @param headers List of headers for the request.
+     * @param endpoint Endpoint to append to the base URL.
      * @param queries List of query parameters to include in the URL.
+     * @param headers List of headers for the request.
      * @param callback Callback for handling the HTTP response.
      * @return CompletableFuture for the HTTP response or null.
      */
     inline fun <reified T> delete(
-        endPoint: String,
-        headers: List<Header>?,
-        queries: List<Query>?,
-        callback: ZListener<T>
+        endpoint: String, queries: List<Query>?, headers: List<Header>?, callback: ZListener<T>
     ): CompletableFuture<HttpResponse?>? {
         return ZDelete(this).processDelete(
-            endPoint, headers, queries, object : TypeToken<T>() {}.type, callback
+            endpoint, queries, headers, object : TypeToken<T>() {}.type, callback
         )
     }
 
@@ -261,33 +250,32 @@ class ZHttpClient private constructor(builder: Builder) {
      * @return A [Response] object containing the result of the DELETE request, or `null` if an error occurs.
      */
     suspend inline fun <reified T> delete(
-        endpoint: String,
-        queries: List<Query>?,
-        headers: List<Header>?
+        endpoint: String, queries: List<Query>?, headers: List<Header>?
     ): Response<T>? {
         return ZDelete(this).processDelete(endpoint, queries, headers)
     }
+
     /**
      * Initiate a PUT request asynchronously.
      *
      * @param endpoint Endpoint to append to the base URL.
      * @param body Request body.
-     * @param headers List of headers for the request.
      * @param queries List of query parameters to include in the URL.
+     * @param headers List of headers for the request.
      * @param typeToken TypeToken for Gson deserialization.
      * @param callback Callback for handling the HTTP response.
      * @return CompletableFuture for the HTTP response or null.
      */
-    fun <T, E> put(
+    fun <T> put(
         endpoint: String,
-        body: T,
-        headers: List<Header>?,
+        body: Any,
         queries: List<Query>?,
-        typeToken: TypeToken<E>,
-        callback: ZListener<E>
+        headers: List<Header>?,
+        typeToken: TypeToken<T>,
+        callback: ZListener<T>
     ): CompletableFuture<HttpResponse?>? {
         return ZPut(this).processPut(
-            endpoint, body, headers, queries, typeToken.type, callback
+            endpoint, body, queries, headers, typeToken.type, callback
         )
     }
 
@@ -296,20 +284,20 @@ class ZHttpClient private constructor(builder: Builder) {
      *
      * @param endpoint Endpoint to append to the base URL.
      * @param body Request body.
-     * @param headers List of headers for the request.
      * @param queries List of query parameters to include in the URL.
+     * @param headers List of headers for the request.
      * @param callback Callback for handling the HTTP response.
      * @return CompletableFuture for the HTTP response or null.
      */
-    inline fun <T, reified E> put(
+    inline fun <reified T> put(
         endpoint: String,
-        body: T,
-        headers: List<Header>?,
+        body: Any,
         queries: List<Query>?,
-        callback: ZListener<E>
+        headers: List<Header>?,
+        callback: ZListener<T>
     ): CompletableFuture<HttpResponse?>? {
         return ZPut(this).processPut(
-            endpoint, body, headers, queries, object : TypeToken<E>() {}.type, callback
+            endpoint, body, queries, headers, object : TypeToken<T>() {}.type, callback
         )
     }
 
@@ -323,12 +311,9 @@ class ZHttpClient private constructor(builder: Builder) {
      * @return A [Response] object containing the result of the PUT request, or `null` if an error occurs.
      */
     suspend inline fun <reified T> put(
-        endpoint: String,
-        body: Any,
-        queries: List<Query>?,
-        headers: List<Header>?
+        endpoint: String, body: Any, queries: List<Query>?, headers: List<Header>?
     ): Response<T>? {
-        return ZPut(this).processPut(endpoint, queries, body, headers)
+        return ZPut(this).processPut(endpoint, body, queries, headers)
     }
 
     /**
@@ -336,22 +321,22 @@ class ZHttpClient private constructor(builder: Builder) {
      *
      * @param endpoint Endpoint to append to the base URL.
      * @param body Request body.
-     * @param headers List of headers for the request.
      * @param queries List of query parameters to include in the URL.
+     * @param headers List of headers for the request.
      * @param typeToken TypeToken for Gson deserialization.
      * @param callback Callback for handling the HTTP response.
      * @return CompletableFuture for the HTTP response or null.
      */
-    fun <T, E> patch(
+    fun <T> patch(
         endpoint: String,
-        body: T,
-        headers: List<Header>?,
+        body: Any,
         queries: List<Query>?,
-        typeToken: TypeToken<E>,
-        callback: ZListener<E>
+        headers: List<Header>?,
+        typeToken: TypeToken<T>,
+        callback: ZListener<T>
     ): CompletableFuture<HttpResponse?>? {
         return ZPatch(this).processPatch(
-            endpoint, body, headers, queries, typeToken.type, callback
+            endpoint, body, queries, headers, typeToken.type, callback
         )
     }
 
@@ -360,20 +345,20 @@ class ZHttpClient private constructor(builder: Builder) {
      *
      * @param endpoint Endpoint to append to the base URL.
      * @param body Request body.
-     * @param headers List of headers for the request.
      * @param queries List of query parameters to include in the URL.
+     * @param headers List of headers for the request.
      * @param callback Callback for handling the HTTP response.
      * @return CompletableFuture for the HTTP response or null.
      */
-    inline fun <T, reified E> patch(
+    inline fun <reified T> patch(
         endpoint: String,
-        body: T,
-        headers: List<Header>?,
+        body: Any,
         queries: List<Query>?,
-        callback: ZListener<E>
+        headers: List<Header>?,
+        callback: ZListener<T>
     ): CompletableFuture<HttpResponse?>? {
         return ZPatch(this).processPatch(
-            endpoint, body, headers, queries, object : TypeToken<E>() {}.type, callback
+            endpoint, body, queries, headers, object : TypeToken<T>() {}.type, callback
         )
     }
 
@@ -387,12 +372,9 @@ class ZHttpClient private constructor(builder: Builder) {
      * @return A [Response] object containing the result of the PATCH request, or `null` if an error occurs.
      */
     suspend inline fun <reified T> patch(
-        endpoint: String,
-        body: Any,
-        queries: List<Query>?,
-        headers: List<Header>?
+        endpoint: String, body: Any, queries: List<Query>?, headers: List<Header>?
     ): Response<T>? {
-        return ZPatch(this).processPatch(endpoint, queries, body, headers)
+        return ZPatch(this).processPatch(endpoint, body, queries, headers)
     }
 
     /**
@@ -400,8 +382,8 @@ class ZHttpClient private constructor(builder: Builder) {
      *
      * @param endpoint Endpoint to append to the base URL.
      * @param parts List of multipart body parts.
-     * @param headers List of headers for the request.
      * @param queries List of query parameters to include in the URL.
+     * @param headers List of headers for the request.
      * @param typeToken TypeToken for Gson deserialization.
      * @param callback Callback for handling the HTTP response.
      * @return CompletableFuture for the HTTP response or null.
@@ -409,13 +391,13 @@ class ZHttpClient private constructor(builder: Builder) {
     fun <T> multiPart(
         endpoint: String,
         parts: List<MultipartBody>,
-        headers: List<Header>?,
         queries: List<Query>?,
+        headers: List<Header>?,
         typeToken: TypeToken<T>,
         callback: ZListener<T>
     ): CompletableFuture<HttpResponse?>? {
         return ZMultipart(this).processMultiPart(
-            endpoint, parts, headers, queries, typeToken.type, callback
+            endpoint, parts, queries, headers, typeToken.type, callback
         )
     }
 
@@ -424,20 +406,20 @@ class ZHttpClient private constructor(builder: Builder) {
      *
      * @param endpoint Endpoint to append to the base URL.
      * @param parts List of multipart body parts.
-     * @param headers List of headers for the request.
      * @param queries List of query parameters to include in the URL.
+     * @param headers List of headers for the request.
      * @param callback Callback for handling the HTTP response.
      * @return CompletableFuture for the HTTP response or null.
      */
     inline fun <reified T> multiPart(
         endpoint: String,
         parts: List<MultipartBody>,
-        headers: List<Header>?,
         queries: List<Query>?,
+        headers: List<Header>?,
         callback: ZListener<T>
     ): CompletableFuture<HttpResponse?>? {
         return ZMultipart(this).processMultiPart(
-            endpoint, parts, headers, queries, object : TypeToken<T>() {}.type, callback
+            endpoint, parts, queries, headers, object : TypeToken<T>() {}.type, callback
         )
     }
 
@@ -451,12 +433,9 @@ class ZHttpClient private constructor(builder: Builder) {
      * @return A [Response] object containing the result of the multi-part request, or `null` if an error occurs.
      */
     suspend inline fun <reified T> multiPart(
-        endpoint: String,
-        parts: List<MultipartBody>,
-        queries: List<Query>?,
-        headers: List<Header>?
+        endpoint: String, parts: List<MultipartBody>, queries: List<Query>?, headers: List<Header>?
     ): Response<T>? {
-        return ZMultipart(this).processMultiPart(endpoint, queries, parts, headers)
+        return ZMultipart(this).processMultiPart(endpoint, parts, queries, headers)
     }
 
     /**

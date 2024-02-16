@@ -29,15 +29,15 @@ class ZPatch(val client: ZHttpClient) {
      * Executes a raw PATCH HTTP request synchronously.
      *
      * @param endpoint Endpoint to append to the base URL.
-     * @param queries List of query parameters to include in the URL.
      * @param requestBody Body of the request.
+     * @param queries List of query parameters to include in the URL.
      * @param headers List of headers to include in the request.
      * @return HttpResponse containing the response details.
      */
     @Synchronized
     @Throws(Exception::class)
-    fun <T> doPatch(
-        endpoint: String, queries: List<Query>?, requestBody: T, headers: List<Header>?
+    fun doPatch(
+        endpoint: String, requestBody: Any, queries: List<Query>?, headers: List<Header>?
     ): HttpResponse? {
         // Build the full URL with endpoint and query parameters
         val urlString = StringBuilder(client.getBaseUrl()).append("/").append(endpoint)
@@ -115,18 +115,18 @@ class ZPatch(val client: ZHttpClient) {
      * Executes a raw PATCH HTTP request asynchronously.
      *
      * @param endpoint Endpoint to append to the base URL.
-     * @param queries List of query parameters to include in the URL.
      * @param requestBody Body of the request.
+     * @param queries List of query parameters to include in the URL.
      * @param headers List of headers to include in the request.
      * @return CompletableFuture that will be completed with the HttpResponse or an exception.
      */
-    private fun <T> doAsyncPatchRequest(
-        endpoint: String, queries: List<Query>?, requestBody: T, headers: List<Header>?
+    private fun doAsyncPatchRequest(
+        endpoint: String, requestBody: Any, queries: List<Query>?, headers: List<Header>?
     ): CompletableFuture<HttpResponse?>? {
         return CompletableFuture.supplyAsync {
             try {
                 // Perform the raw PATCH request
-                doPatch(endpoint, queries, requestBody, headers)
+                doPatch(endpoint, requestBody, queries, headers)
                     ?: throw RuntimeException("Received null response for HTTP request to $endpoint")
             } catch (e: IOException) {
                 // If an IOException occurs, wrap it in a RuntimeException
@@ -147,8 +147,8 @@ class ZPatch(val client: ZHttpClient) {
      * Performs a suspended PATCH HTTP request asynchronously, returning a [Deferred] object containing the result.
      *
      * @param endpoint The endpoint URL to send the PATCH request to.
-     * @param queries The list of query parameters to include in the request.
      * @param requestBody The request body to include in the PATCH request.
+     * @param queries The list of query parameters to include in the request.
      * @param headers The list of headers to include in the request.
      * @return A [Deferred] object containing the result of the PATCH request.
      */
@@ -158,7 +158,7 @@ class ZPatch(val client: ZHttpClient) {
         return withContext(Dispatchers.IO) {
             async {
                 try {
-                    doPatch(endpoint, queries, requestBody, headers)
+                    doPatch(endpoint, requestBody, queries, headers)
                 } catch (e: Exception) {
                     Log.e(TAG, "doSuspendedPatchRequest: $e", e)
                     val response = HttpResponse(exception = e)
@@ -172,15 +172,16 @@ class ZPatch(val client: ZHttpClient) {
      * Processes a PATCH HTTP request asynchronously.
      *
      * @param endpoint The endpoint URL to send the PATCH request to.
-     * @param queries The list of query parameters to include in the request.
      * @param requestBody The request body to include in the PATCH request.
+     * @param queries The list of query parameters to include in the request.
      * @param headers The list of headers to include in the request.
      * @return A [Response] object containing the result of the PATCH request, or `null` if an error occurs.
      */
     suspend inline fun <reified T> processPatch(
-        endpoint: String, queries: List<Query>?, requestBody: Any, headers: List<Header>?
+        endpoint: String, requestBody: Any, queries: List<Query>?, headers: List<Header>?
     ): Response<T>? {
-        val response = doSuspendedPatchRequest(endpoint, queries, requestBody, headers).await() ?: return null
+        val response =
+            doSuspendedPatchRequest(endpoint, queries, requestBody, headers).await() ?: return null
 
         response.exception?.let {
             Log.e("ZPatch", "processPatch: $it", it)
@@ -204,30 +205,30 @@ class ZPatch(val client: ZHttpClient) {
      *
      * @param endpoint Endpoint to append to the base URL.
      * @param requestBody Body of the request.
-     * @param headers List of headers to include in the request.
      * @param queries List of query parameters to include in the URL.
+     * @param headers List of headers to include in the request.
      * @param type Type of the response body.
      * @param callback Callback to handle the HttpResponse or an exception.
      * @return CompletableFuture that will be completed with the HttpResponse or an exception.
      */
-    fun <T, E> processPatch(
+    fun <T> processPatch(
         endpoint: String,
-        requestBody: T,
-        headers: List<Header>?,
+        requestBody: Any,
         queries: List<Query>?,
+        headers: List<Header>?,
         type: Type,
-        callback: ZListener<E>
+        callback: ZListener<T>
     ): CompletableFuture<HttpResponse?>? {
 
         // Perform the async PATCH request
-        val futureResponse = doAsyncPatchRequest(endpoint, queries, requestBody, headers)
+        val futureResponse = doAsyncPatchRequest(endpoint, requestBody, queries, headers)
 
         // Handle the response or exception when the CompletableFuture is complete
         futureResponse?.thenAccept { httpResponse ->
             httpResponse?.let { result ->
                 try {
                     // Parse the response body using Gson
-                    val obj = client.getGsonInstance().fromJson<E>(result.body, type)
+                    val obj = client.getGsonInstance().fromJson<T>(result.body, type)
                     // Build a Response object
                     val response = Response(
                         result.code,
@@ -246,7 +247,7 @@ class ZPatch(val client: ZHttpClient) {
                     Log.e(TAG, "processPatch: $e", e)
                     val response = Response(
                         result.code,
-                        if (type == String::class.java) result.body as E else null,
+                        if (type == String::class.java) result.body as T else null,
                         result.headers,
                         result.body,
                         result.date,

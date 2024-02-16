@@ -189,16 +189,16 @@ class ZDelete(val client: ZHttpClient) {
      * Process a DELETE HTTP request with callback for the response.
      *
      * @param endpoint Endpoint to append to the base URL.
-     * @param headers List of headers to include in the request.
      * @param queries List of query parameters to include in the URL.
+     * @param headers List of headers to include in the request.
      * @param type Type of the response body.
      * @param callback Callback to handle the HttpResponse or an exception.
      * @return CompletableFuture that will be completed with the HttpResponse or an exception.
      */
     fun <T> processDelete(
         endpoint: String,
-        headers: List<Header>?,
         queries: List<Query>?,
+        headers: List<Header>?,
         type: Type,
         callback: ZListener<T>
     ): CompletableFuture<HttpResponse?>? {
