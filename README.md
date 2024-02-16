@@ -271,7 +271,7 @@ To make a suspended `PUT` request using ZHttp, here's an example of the syntax :
 
 ```kotlin
 // The syntax of a PUT request.
-val response = storeClient.put<ShopItem>(END_POINT", BODY, QUERIES, HEADERS)
+val response = client.put<RESPONSE_TYPE>(END_POINT, BODY, QUERIES, HEADERS)
 ```
 
 It will return you a `response` of the specified `RESPONSE_TYPE`
