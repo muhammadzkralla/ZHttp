@@ -3,6 +3,11 @@ package com.zkrallah.zhttp
 import android.util.Log
 import com.google.gson.JsonParseException
 import com.zkrallah.zhttp.Helper.callOnMainThread
+import com.zkrallah.zhttp.Helper.deserializeBody
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
@@ -18,7 +23,7 @@ import java.util.concurrent.CompletableFuture
  * @param client ZHttpClient instance of the client.
  */
 @Suppress("UNUSED", "UNCHECKED_CAST")
-class ZGet(private val client: ZHttpClient) {
+class ZGet(val client: ZHttpClient) {
 
     /**
      * Executes a raw GET HTTP request synchronously.
@@ -124,6 +129,60 @@ class ZGet(private val client: ZHttpClient) {
                 throw throwable
             }
         }
+    }
+
+    /**
+     * Performs a suspended GET HTTP request asynchronously, returning a [Deferred] object containing the result.
+     *
+     * @param endpoint The endpoint URL to send the GET request to.
+     * @param queries The list of query parameters to include in the request.
+     * @param headers The list of headers to include in the request.
+     * @return A [Deferred] object containing the result of the GET request.
+     */
+    suspend fun doSuspendedGetRequest(
+        endpoint: String, queries: List<Query>?, headers: List<Header>?
+    ): Deferred<HttpResponse?> {
+        return withContext(Dispatchers.IO) {
+            async {
+                try {
+                    doGet(endpoint, queries, headers)
+                } catch (e: Exception) {
+                    Log.e(TAG, "doSuspendedGetRequest: $e", e)
+                    val response = HttpResponse(exception = e)
+                    response
+                }
+            }
+        }
+    }
+
+    /**
+     * Processes a GET HTTP request asynchronously.
+     *
+     * @param endpoint The endpoint URL to send the GET request to.
+     * @param queries The list of query parameters to include in the request.
+     * @param headers The list of headers to include in the request.
+     * @return A [Response] object containing the result of the GET request, or `null` if an error occurs.
+     */
+    suspend inline fun <reified T> processGet(
+        endpoint: String, queries: List<Query>?, headers: List<Header>?
+    ): Response<T>? {
+        val response = doSuspendedGetRequest(endpoint, queries, headers).await() ?: return null
+
+        response.exception?.let {
+            Log.e("ZGet", "processGet: $it", it)
+        }
+
+        val body = client.getGsonInstance().deserializeBody<T>(response.body)
+
+        return Response(
+            code = response.code,
+            body = body,
+            headers = response.headers,
+            raw = response.body,
+            date = response.date,
+            permission = response.permission,
+            exception = response.exception
+        )
     }
 
     /**
