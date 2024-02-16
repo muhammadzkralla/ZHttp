@@ -3,6 +3,11 @@ package com.zkrallah.zhttp
 import android.util.Log
 import com.google.gson.JsonParseException
 import com.zkrallah.zhttp.Helper.callOnMainThread
+import com.zkrallah.zhttp.Helper.deserializeBody
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
@@ -18,7 +23,7 @@ import java.util.concurrent.CompletableFuture
  * @param client ZHttpClient instance of the client.
  */
 @Suppress("UNUSED", "UNCHECKED_CAST")
-class ZPatch(private val client: ZHttpClient) {
+class ZPatch(val client: ZHttpClient) {
 
     /**
      * Executes a raw PATCH HTTP request synchronously.
@@ -136,6 +141,44 @@ class ZPatch(private val client: ZHttpClient) {
                 throw throwable
             }
         }
+    }
+
+    suspend fun doSuspendedPatchRequest(
+        endpoint: String, queries: List<Query>?, requestBody: Any, headers: List<Header>?
+    ): Deferred<HttpResponse?> {
+        return withContext(Dispatchers.IO) {
+            async {
+                try {
+                    doPatch(endpoint, queries, requestBody, headers)
+                } catch (e: Exception) {
+                    Log.e(TAG, "doSuspendedPatchRequest: $e", e)
+                    val response = HttpResponse(exception = e)
+                    response
+                }
+            }
+        }
+    }
+
+    suspend inline fun <reified T> processPatch(
+        endpoint: String, queries: List<Query>?, requestBody: Any, headers: List<Header>?
+    ): Response<T>? {
+        val response = doSuspendedPatchRequest(endpoint, queries, requestBody, headers).await() ?: return null
+
+        response.exception?.let {
+            Log.e("ZPatch", "processPatch: $it", it)
+        }
+
+        val body = client.getGsonInstance().deserializeBody<T>(response.body)
+
+        return Response(
+            code = response.code,
+            body = body,
+            headers = response.headers,
+            raw = response.body,
+            date = response.date,
+            permission = response.permission,
+            exception = response.exception
+        )
     }
 
     /**

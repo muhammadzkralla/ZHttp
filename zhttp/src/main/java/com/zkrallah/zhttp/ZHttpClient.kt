@@ -288,6 +288,15 @@ class ZHttpClient private constructor(builder: Builder) {
         )
     }
 
+    suspend inline fun <reified T> put(
+        endpoint: String,
+        body: Any,
+        headers: List<Header>?,
+        queries: List<Query>?,
+    ): Response<T>? {
+        return ZPut(this).processPut(endpoint, queries, body, headers)
+    }
+
     /**
      * Initiate a PATCH request asynchronously.
      *
@@ -334,6 +343,15 @@ class ZHttpClient private constructor(builder: Builder) {
         )
     }
 
+    suspend inline fun <reified T> patch(
+        endpoint: String,
+        body: Any,
+        headers: List<Header>?,
+        queries: List<Query>?,
+    ): Response<T>? {
+        return ZPatch(this).processPatch(endpoint, queries, body, headers)
+    }
+
     /**
      * Initiate a multipart/form-data request asynchronously.
      *
@@ -378,6 +396,15 @@ class ZHttpClient private constructor(builder: Builder) {
         return ZMultipart(this).processMultiPart(
             endpoint, parts, headers, queries, object : TypeToken<T>() {}.type, callback
         )
+    }
+
+    suspend inline fun <reified T> multiPart(
+        endpoint: String,
+        parts: List<MultipartBody>,
+        headers: List<Header>?,
+        queries: List<Query>?,
+    ): Response<T>? {
+        return ZMultipart(this).processMultiPart(endpoint, queries, parts, headers)
     }
 
     /**
