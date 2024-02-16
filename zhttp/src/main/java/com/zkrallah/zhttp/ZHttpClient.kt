@@ -184,6 +184,15 @@ class ZHttpClient private constructor(builder: Builder) {
         )
     }
 
+    suspend inline fun <reified T> post (
+        endpoint: String,
+        body: Any,
+        headers: List<Header>?,
+        queries: List<Query>?,
+    ): Response<T>? {
+        return ZPost(this).processPost(endpoint, queries, body, headers)
+    }
+
     /**
      * Initiate a DELETE request asynchronously.
      *
