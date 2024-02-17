@@ -394,7 +394,7 @@ Finally create the `MULTIPART` request itself :
 
 ```kotlin
 // The syntax of a MULTIPART request.
-val response = client.multiPart(END_POINT, parts, QUERIES, HEADERS)
+val response = client.multiPart<RESPONSE_TYPE>(END_POINT, parts, QUERIES, HEADERS)
 ```
 
 It will return you a `response` of the specified `RESPONSE_TYPE`
