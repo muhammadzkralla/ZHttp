@@ -51,14 +51,14 @@ class ZDelete(val client: ZHttpClient) {
             // Set the request method to DELETE
             connection.requestMethod = DELETE
 
+            // Add default headers from the ZHttpClient
+            client.getDefaultHeaders().forEach { (key, value) ->
+                connection.addRequestProperty(key, value)
+            }
+
             // Add headers to the request
             headers?.forEach { (key, value) ->
                 connection.addRequestProperty(key, value)
-            } ?: run {
-                // If headers are not provided, use default headers from the ZHttpClient
-                client.getDefaultHeaders().forEach { (key, value) ->
-                    connection.addRequestProperty(key, value)
-                }
             }
 
             val response = StringBuilder()
