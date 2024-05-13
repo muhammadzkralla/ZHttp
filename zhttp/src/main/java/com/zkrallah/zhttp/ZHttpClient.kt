@@ -450,7 +450,7 @@ class ZHttpClient private constructor(builder: Builder) {
         private var connectionTimeout = 20000
         private var readTimeout = 20000
         private var defaultHeaders = listOf(
-            Header("Content-Type", "application/json; charset=UTF-8")
+            Header("Content-Type", "application/json")
         )
         private var filesBufferSize = 1024
 
