@@ -56,15 +56,15 @@ class ZMultipart(val client: ZHttpClient) {
             connection.requestMethod = POST
             connection.doOutput = true
 
+            // Add default headers from the ZHttpClient
+            client.getDefaultHeaders().forEach { (key, value) ->
+                connection.addRequestProperty(key, value)
+            }
+
             // Add headers to the request
             connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=$BOUNDARY")
             headers?.forEach { (key, value) ->
                 connection.addRequestProperty(key, value)
-            } ?: run {
-                // If headers are not provided, use default headers from the ZHttpClient
-                client.getDefaultHeaders().forEach { (key, value) ->
-                    connection.addRequestProperty(key, value)
-                }
             }
 
             // Opens the DataOutputStream to write the request body

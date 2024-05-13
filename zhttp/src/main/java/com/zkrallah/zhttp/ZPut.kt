@@ -53,14 +53,14 @@ class ZPut(val client: ZHttpClient) {
             connection.requestMethod = PUT
             connection.doOutput = true
 
+            // Add default headers from the ZHttpClient
+            client.getDefaultHeaders().forEach { (key, value) ->
+                connection.addRequestProperty(key, value)
+            }
+
             // Add headers to the request
             headers?.forEach { (key, value) ->
                 connection.addRequestProperty(key, value)
-            } ?: run {
-                // If headers are not provided, use default headers from the ZHttpClient
-                client.getDefaultHeaders().forEach { (key, value) ->
-                    connection.addRequestProperty(key, value)
-                }
             }
 
             // Serialize the request body to JSON
