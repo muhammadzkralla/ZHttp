@@ -182,8 +182,6 @@ To cancel the request :
 getRequest.cancel()
 ```
 
-> **Note:** Once the process is done, this message is logged with the TAG `"ZGet"` : `"processGet: DONE"`, or `"processGet: CANCELLED"` if cancelled.
-
 <h1 align = "center"> Asynchronous Coroutine POST </h1> <br>
 
 To make a suspended `POST` request using ZHttp, here's an example of the syntax :
