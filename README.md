@@ -91,9 +91,6 @@ val client = ZHttpClient.Builder()
 
 ```
 
-> **Note:** Default headers are not added to the request unless you pass `null` to the headers argument of the request function.
->  We will explain this part more later in the `GET` Request section.
-
 You can also specify the buffer size for file uploading in `MULTIPART` requests : <br> 
 
 ```kotlin
@@ -141,15 +138,15 @@ To make a suspended `GET` request using ZHttp, here's an example of the syntax :
 
 ```kotlin
 // The syntax of a GET request.
-val response = client.get<RESPONSE_TYPE>(END_POINT, QUERIES, HEADERS)
+val response = client.get<TYPE>(ENDPOINT, QUERIES, HEADERS)
 ```
 
-It will return you a `response` of the specified `RESPONSE_TYPE`
+It will return you a `response` of the specified `TYPE`
 
 This `response` is a data class that contains the response code, the deserialized body,
 response headers, permissions, and exceptions of the HTTP request.
 
-> **IMPORTANT:** `RESPONSE_TYPE` is generic, that means that it can be of type string, data class, list of objects, map of any object to any object..etc It's totally type-safe.
+> **IMPORTANT:** `TYPE` is generic, that means that it can be of type string, data class, list of objects, map of any object to any object..etc It's totally type-safe.
 
 > **Note:** If the `HEADERS` argument is `null`, the default headers will be added to the request automatically,
 > `QUERIES` argument can be `null` too but, if you want to add `HEADERS` or `QUERIES` to the request :
@@ -169,30 +166,22 @@ val QUERIES = listOf(
 > **However:** If you specify custom headers for the request, default headers are not going to be added to the request,
 >  meaning that only the specified headers will be added to this request.
 
-<h1 align = "center"> Asynchronous Callback GET </h1> <br>
+<h1 align = "center"> Asynchronous Lambda GET </h1> <br>
 
 To make a callback `GET` request using ZHttp, here's an example of the syntax :
 
 ```kotlin
 // The syntax of a GET request.
-val getRequest = client.get(END_POINT, QUERIES, HEADERS, object : ZListener<RESPONSE_TYPE> {
-            override fun onSuccess(response: Response<RESPONSE_TYPE>?) {
-                Log.d(TAG, "onSuccess: $response")
-                // Handle success :
-            }
-
-            override fun onFailure(error: Exception) {
-                Log.e(TAG, "onFailure: $error", error)
-                // Handle failure :
-            }
-})
+val getRequest = client.get<TYPE>(ENDPOINT, HEADERS, QUERIES) { success, failure ->
+	
+}
 ```
 
 To cancel the request :
 
 ```kotlin
 // Cancelling the request to free up resources.
-getRequest?.cancel(true)
+getRequest.cancel()
 ```
 
 > **Note:** Once the process is done, this message is logged with the TAG `"ZGet"` : `"processGet: DONE"`, or `"processGet: CANCELLED"` if cancelled.
@@ -203,34 +192,25 @@ To make a suspended `POST` request using ZHttp, here's an example of the syntax 
 
 ```kotlin
 // The syntax of a POST request.
-val response = client.post<RESPONSE_TYPE>(END_POINT, BODY, QUERIES, HEADERS)
+val response = client.post<TYPE>(ENDPOINT, BODY, QUERIES, HEADERS)
 ```
 
-It will return you a `response` of the specified `RESPONSE_TYPE`
+It will return you a `response` of the specified `TYPE`
 
 > **IMPORTANT:** `BODY` is generic, that means that it can be a string, data class object, list of objects, map of any object to any object..etc It's totally type-safe. 
 
-<h1 align = "center"> Asynchronous Callback POST </h1> <br>
+<h1 align = "center"> Asynchronous Lambda POST </h1> <br>
 
 To make a callback `POST` request using ZHttp, here's an example of the syntax :
 
 ```kotlin
 // The syntax of a POST request.
-val postRequest = client.post(END_POINT, BODY, QUERIES, HEADERS, object : ZListener<RESPONSE_TYPE> {
-            override fun onSuccess(response: Response<RESPONSE_TYPE>?) {
-                Log.d(TAG, "onSuccess: $response")
-                // Handle success :
-            }
-
-            override fun onFailure(error: Exception) {
-                Log.e(TAG, "onFailure: $error", error)
-                // Handle failure :
-            }
-
-})
+val postRequest = client.post<TYPE>(ENDPOINT, BODY, HEADERS, QUERIES) { success, failure ->
+	
+}
 ```
 
-> **Note:** `HEADERS`, `QUERIES`, `RESPONSE_TYPE`, logging messages, and cancellation strategy follow the same rules as in the `GET` request. 
+> **Note:** `HEADERS`, `QUERIES`, `TYPE`, logging messages, and cancellation strategy follow the same rules as in the `GET` request. 
 
 <h1 align = "center"> Asynchronous Coroutine DELETE </h1> <br>
 
@@ -238,32 +218,23 @@ To make a suspended `DELETE` request using ZHttp, here's an example of the synta
 
 ```kotlin
 // The syntax of a DELETE request.
-val response = client.delete<RESPONSE_TYPE>(END_POINT, QUERIES, HEADERS)
+val response = client.delete<TYPE>(ENDPOINT, QUERIES, HEADERS)
 ```
 
-It will return you a `response` of the specified `RESPONSE_TYPE`
+It will return you a `response` of the specified `TYPE`
 
-<h1 align = "center"> Asynchronous Callback DELETE </h1> <br>
+<h1 align = "center"> Asynchronous Lambda DELETE </h1> <br>
 
 To make a callback `DELETE` request using ZHttp, here's an example of the syntax :
 
 ```kotlin
 // The syntax of a DELETE request.
-val deleteRequest = client.delete(END_POINT, QUERIES, HEADERS, object : ZListener<RESPONSE_TYPE> {
-            override fun onSuccess(response: Response<RESPONSE_TYPE>?) {
-                Log.d(TAG, "onSuccess: $response")
-                // Handle success :
-            }
-
-            override fun onFailure(error: Exception) {
-                Log.e(TAG, "onFailure: $error", error)
-                // Handle failure :
-            }
-
-})
+val deleteRequest = client.delete<TYPE>(ENDPOINT, HEADERS, QUERIES) { success, failure ->
+	
+}
 ```
 
-> **Note:** `HEADERS`, `QUERIES`, `RESPONSE_TYPE`, logging messages, and cancellation strategy follow the same rules as in the `GET` request. 
+> **Note:** `HEADERS`, `QUERIES`, `TYPE`, logging messages, and cancellation strategy follow the same rules as in the `GET` request. 
 
 <h1 align = "center"> Asynchronous Coroutine PUT </h1> <br>
 
@@ -271,33 +242,25 @@ To make a suspended `PUT` request using ZHttp, here's an example of the syntax :
 
 ```kotlin
 // The syntax of a PUT request.
-val response = client.put<RESPONSE_TYPE>(END_POINT, BODY, QUERIES, HEADERS)
+val response = client.put<TYPE>(ENDPOINT, BODY, QUERIES, HEADERS)
 ```
 
-It will return you a `response` of the specified `RESPONSE_TYPE`
+It will return you a `response` of the specified `TYPE`
 
-<h1 align = "center"> Asynchronous Callback PUT </h1> <br>
+<h1 align = "center"> Asynchronous Lambda PUT </h1> <br>
 
 To make a callback `PUT` request using ZHttp, here's an example of the syntax :
 
 ```kotlin
 // The syntax of a PUT request.
-val putRequest = client.put(END_POINT, BODY, QUERIES, HEADERS, object : ZListener<RESPONSE_TYPE> {
-            override fun onSuccess(response: Response<RESPONSE_TYPE>?) {
-                Log.d(TAG, "onSuccess: $response")
-                // Handle success :
-            }
-
-            override fun onFailure(error: Exception) {
-                Log.e(TAG, "onFailure: $error", error)
-                // Handle failure :
-            }
-})
+client.put<TYPE>(ENDPOINT, BODY, HEADERS, QUERIES) { success, failure ->
+	
+}
 ```
 
 > **IMPORTANT:** `BODY` is generic, that means that it can be a string, data class object, list of objects, map of any object to any object..etc It's totally type-safe. 
 
-> **Note:** `HEADERS`, `QUERIES`, `RESPONSE_TYPE`, logging messages, and cancellation strategy follow the same rules as in the `GET` request.
+> **Note:** `HEADERS`, `QUERIES`, `TYPE`, logging messages, and cancellation strategy follow the same rules as in the `GET` request.
 
 <h1 align = "center"> Asynchronous Coroutine PATCH </h1> <br>
 
@@ -312,12 +275,12 @@ val ARG = JsonObject().apply {
 data class UpdateArg(val arg: Any? = null)
 val ARG = UpdateArg(arg = "New Value!")
 
-val response = client.patch<RESPONSE_TYPE>(END_POINT, ARG, QUERIES, HEADERS)
+val response = client.patch<TYPE>(ENDPOINT, ARG, QUERIES, HEADERS)
 ```
 
-It will return you a `response` of the specified `RESPONSE_TYPE`
+It will return you a `response` of the specified `TYPE`
 
-<h1 align = "center"> Asynchronous Callback PATCH </h1> <br>
+<h1 align = "center"> Asynchronous Lambda PATCH </h1> <br>
 
 To make a callback `PATCH` request using ZHttp, here's an example of the syntax :
 
@@ -330,21 +293,12 @@ val ARG = JsonObject().apply {
 data class UpdateArg(val arg: Any? = null)
 val ARG = UpdateArg(arg = "New Value!")
 
-val patchRequest = client.patch(END_POINT, ARG, QUERIES, HEADERS, object : ZListener<RESPONSE_TYPE> {
-            override fun onSuccess(response: Response<RESPONSE_TYPE>?) {
-                Log.d(TAG, "onSuccess: $response")
-                // Handle success :
-            }
-
-            override fun onFailure(error: Exception) {
-                Log.e(TAG, "onFailure: $error", error)
-                // Handle failure :
-            }
-
-})
+val patchRequest = client.patch<TYPE>(ENDPOINT, ARG, HEADERS, QUERIES) { success, failure ->
+	
+}
 ```
 
-> **Note:** `HEADERS`, `QUERIES`, `RESPONSE_TYPE`, logging messages, and cancellation strategy follow the same rules as in the `GET` request.
+> **Note:** `HEADERS`, `QUERIES`, `TYPE`, logging messages, and cancellation strategy follow the same rules as in the `GET` request.
 
 <h1 align = "center"> Asynchronous MULTIPART </h1> <br>
 
@@ -394,29 +348,21 @@ Finally create the `MULTIPART` request itself :
 
 ```kotlin
 // The syntax of a MULTIPART request.
-val response = client.multiPart<RESPONSE_TYPE>(END_POINT, parts, QUERIES, HEADERS)
+val response = client.multiPart<TYPE>(ENDPOINT, parts, QUERIES, HEADERS)
 ```
 
-It will return you a `response` of the specified `RESPONSE_TYPE`
+It will return you a `response` of the specified `TYPE`
 
-<h2> Asynchronous Callback MULTIPART </h2> <br>
+<h2> Asynchronous Lambda MULTIPART </h2> <br>
 
 ```kotlin
 // The syntax of a MULTIPART request.
-val multipart = client.multiPart(END_POINT, parts, QUERIES, HEADERS, object : ZListener<RESPONSE_TYPE> {
-            override fun onSuccess(response: Response<RESPONSE_TYPE>?) {
-                Log.d(TAG, "onSuccess: $response")
-                // Handle success :
-            }
-
-            override fun onFailure(error: Exception) {
-                Log.e(TAG, "onFailure: $error", error)
-                // Handle failure :
-            }
-})
+val multipart = client.multiPart<TYPE>(ENDPOINT, PARTS, HEADERS, QUERIES) { success, failure ->
+	
+}
 ```
 
-> **Note:** `HEADERS`, `QUERIES`, `RESPONSE_TYPE`, logging messages, and cancellation strategy follow the same rules as in the `GET` request.
+> **Note:** `HEADERS`, `QUERIES`, `TYPE`, logging messages, and cancellation strategy follow the same rules as in the `GET` request.
 
 > **CRUCIAL:** Please do not attempt to make a `MultipartBody` with both `name`, `body` and `fileName`, `filePath` in the same object, for example :
 
