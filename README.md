@@ -148,8 +148,8 @@ response headers, permissions, and exceptions of the HTTP request.
 
 > **IMPORTANT:** `TYPE` is generic, that means that it can be of type string, data class, list of objects, map of any object to any object..etc It's totally type-safe.
 
-> **Note:** If the `HEADERS` argument is `null`, the default headers will be added to the request automatically,
-> `QUERIES` argument can be `null` too but, if you want to add `HEADERS` or `QUERIES` to the request :
+> **Note:** 
+> `QUERIES`, `HEADERS` arguments can be `null` but, if you want to add `HEADERS` or `QUERIES` to the request :
 
 ```kotlin
 // Adding custom headers and queries to the request.
@@ -163,8 +163,6 @@ val QUERIES = listOf(
             Query("param2", "value")
 )
 ```
-> **However:** If you specify custom headers for the request, default headers are not going to be added to the request,
->  meaning that only the specified headers will be added to this request.
 
 <h1 align = "center"> Asynchronous Lambda GET </h1> <br>
 
