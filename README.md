@@ -41,13 +41,28 @@ dependencyResolutionManagement {
 ```gradle
 // Add this dependency to your build.gradle.kts (module) :
 dependencies {
-      implementation("com.github.muhammadzkralla:ZHttp:1.6")
+      implementation("com.github.muhammadzkralla:ZHttp:2.1")
 }
 ```
 
 
 ## How to use
 As stated above, ZHttp supports the `GET`, `POST`, `DELETE`, `PUT`, `PATCH`, and `MULTIPART` requests. We will illustrate how to use each one of them below.
+
+<table align="center">
+  <tr>
+    <td> 
+      <img src ="https://github.com/muhammadzkralla/ZHttp/assets/54005330/f8b3a699-5705-423e-8ddd-ba7b65bee9a8"/>
+    </td>
+    <td>
+      <img src ="https://github.com/muhammadzkralla/ZHttp/assets/54005330/abfcba37-1b26-491f-ac60-ffd68425dc59"/>
+    </td>
+    <td>
+      <img src ="https://github.com/muhammadzkralla/ZHttp/assets/54005330/75d19040-95bb-4ed0-abcc-784fb1dd64d8"/>
+    </td>
+  </tr>
+
+</table>
 
 <h1 align = "center">  ZHttpClient  </h1> <br>
 ZHttpClient is your gate to make any request. To get started, we make an instance of the client : <br> <br>
@@ -170,7 +185,7 @@ To make a callback `GET` request using ZHttp, here's an example of the syntax :
 
 ```kotlin
 // The syntax of a GET request.
-val getRequest = client.get<TYPE>(ENDPOINT, HEADERS, QUERIES) { success, failure ->
+val getRequest = client.get<TYPE>(ENDPOINT, QUERIES, HEADERS) { success, failure ->
 	
 }
 ```
@@ -201,7 +216,7 @@ To make a callback `POST` request using ZHttp, here's an example of the syntax :
 
 ```kotlin
 // The syntax of a POST request.
-val postRequest = client.post<TYPE>(ENDPOINT, BODY, HEADERS, QUERIES) { success, failure ->
+val postRequest = client.post<TYPE>(ENDPOINT, BODY, QUERIES, HEADERS) { success, failure ->
 	
 }
 ```
@@ -225,7 +240,7 @@ To make a callback `DELETE` request using ZHttp, here's an example of the syntax
 
 ```kotlin
 // The syntax of a DELETE request.
-val deleteRequest = client.delete<TYPE>(ENDPOINT, HEADERS, QUERIES) { success, failure ->
+val deleteRequest = client.delete<TYPE>(ENDPOINT, QUERIES, HEADERS) { success, failure ->
 	
 }
 ```
@@ -249,7 +264,7 @@ To make a callback `PUT` request using ZHttp, here's an example of the syntax :
 
 ```kotlin
 // The syntax of a PUT request.
-client.put<TYPE>(ENDPOINT, BODY, HEADERS, QUERIES) { success, failure ->
+client.put<TYPE>(ENDPOINT, BODY, QUERIES, HEADERS) { success, failure ->
 	
 }
 ```
@@ -289,7 +304,7 @@ val ARG = JsonObject().apply {
 data class UpdateArg(val arg: Any? = null)
 val ARG = UpdateArg(arg = "New Value!")
 
-val patchRequest = client.patch<TYPE>(ENDPOINT, ARG, HEADERS, QUERIES) { success, failure ->
+val patchRequest = client.patch<TYPE>(ENDPOINT, ARG, QUERIES, HEADERS) { success, failure ->
 	
 }
 ```
@@ -353,7 +368,7 @@ It will return you a `response` of the specified `TYPE`
 
 ```kotlin
 // The syntax of a MULTIPART request.
-val multipart = client.multiPart<TYPE>(ENDPOINT, PARTS, HEADERS, QUERIES) { success, failure ->
+val multipart = client.multiPart<TYPE>(ENDPOINT, PARTS, QUERIES, HEADERS) { success, failure ->
 	
 }
 ```
