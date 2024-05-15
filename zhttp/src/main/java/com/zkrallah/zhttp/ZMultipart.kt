@@ -2,30 +2,27 @@ package com.zkrallah.zhttp
 
 import android.util.Log
 import com.google.gson.JsonParseException
-import com.zkrallah.zhttp.Helper.callOnMainThread
 import com.zkrallah.zhttp.Helper.deserializeBody
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.DataOutputStream
 import java.io.FileInputStream
-import java.io.IOException
 import java.io.InputStreamReader
-import java.lang.reflect.Type
 import java.net.HttpURLConnection
 import java.net.SocketTimeoutException
 import java.net.URL
-import java.util.concurrent.CompletableFuture
-import kotlin.jvm.Throws
 
 /**
  * ZMultipart class for handling multipart/form-data HTTP requests.
  *
  * @param client ZHttpClient instance of the client.
  */
-@Suppress("UNUSED", "UNCHECKED_CAST")
 class ZMultipart(val client: ZHttpClient) {
 
     /**
@@ -198,103 +195,47 @@ class ZMultipart(val client: ZHttpClient) {
     }
 
     /**
-     * Executes a raw multipart/form-data POST HTTP request asynchronously.
-     *
-     * @param endpoint Endpoint to append to the base URL.
-     * @param parts List of MultipartBody parts to include in the request.
-     * @param queries List of query parameters to include in the URL.
-     * @param headers List of headers to include in the request.
-     * @return CompletableFuture that will be completed with the HttpResponse or an exception.
-     */
-    private fun doAsyncMultipartRequest(
-        endpoint: String, parts: List<MultipartBody>, queries: List<Query>?, headers: List<Header>?
-    ): CompletableFuture<HttpResponse?>? {
-        return CompletableFuture.supplyAsync {
-            try {
-                // Perform the raw MULTIPART request
-                doMultipart(endpoint, parts, queries, headers)
-                    ?: throw RuntimeException("Received null response for HTTP request to $endpoint")
-            } catch (e: IOException) {
-                // If an IOException occurs, wrap it in a RuntimeException
-                throw RuntimeException("Error during HTTP request to $endpoint", e)
-            }
-        }.exceptionally { throwable ->
-            // Handle exceptions during async execution
-            if (throwable is RuntimeException) {
-                Log.e(TAG, "Error during async HTTP request: ${throwable.message}")
-                HttpResponse()
-            } else {
-                throw throwable
-            }
-        }
-    }
-
-    /**
      * Process a multipart/form-data POST HTTP request with callback for the response.
      *
      * @param endpoint Endpoint to append to the base URL.
      * @param parts List of MultipartBody parts to include in the request.
      * @param queries List of query parameters to include in the URL.
      * @param headers List of headers to include in the request.
-     * @param type Type of the response body.
-     * @param callback Callback to handle the HttpResponse or an exception.
-     * @return CompletableFuture that will be completed with the HttpResponse or an exception.
+     * @param onComplete Callback to handle the HttpResponse or an exception.
+     * @return Job that will be completed with the HttpResponse or an exception.
      */
-    fun <T> processMultiPart(
+    inline fun <reified T> processMultiPart(
         endpoint: String,
         parts: List<MultipartBody>,
-        queries: List<Query>?,
         headers: List<Header>?,
-        type: Type,
-        callback: ZListener<T>
-    ): CompletableFuture<HttpResponse?>? {
-        // Perform the async MULTIPART request
-        val futureResponse = doAsyncMultipartRequest(endpoint, parts, queries, headers)
+        queries: List<Query>?,
+        crossinline onComplete: (success: Response<T>?, failure: Exception?) -> Unit
+    ): Job {
+        return CoroutineScope(Dispatchers.IO).launch {
+            val response = doSuspendedMultipartRequest(endpoint, parts, queries, headers).await()
 
-        // Handle the response or exception when the CompletableFuture is complete
-        futureResponse?.whenComplete { httpResponse, _ ->
-            httpResponse?.let { result ->
-                try {
-                    // Parse the response body using Gson
-                    val obj = client.getGsonInstance().fromJson<T>(result.body, type)
-                    // Build a Response object
-                    val response = Response(
-                        result.code,
-                        obj,
-                        result.headers,
-                        result.body,
-                        result.date,
-                        result.permission
-                    )
-                    // Call the callback on the main thread with the successful response
-                    if (result.exception == null) callOnMainThread(response, null, callback)
-                    // Call the callback on the main thread with the exception
-                    else callOnMainThread(null, result.exception, callback)
-                } catch (e: JsonParseException) {
-                    // Handle Gson parsing exception
-                    Log.e(TAG, "processMultiPart: $e", e)
-                    val response = Response(
-                        result.code,
-                        if (type == String::class.java) result.body as T else null,
-                        result.headers,
-                        result.body,
-                        result.date,
-                        result.permission
-                    )
-                    if (type == String::class.java) callOnMainThread(response, null, callback)
-                    else callOnMainThread(null, e, callback)
-                } catch (e: Exception) {
-                    // Handle other exceptions
-                    callOnMainThread(null, e, callback)
-                }
+            if (response?.code == null) {
+                onComplete(null, NullPointerException("Could not make request."))
+                return@launch
             }
-            // Log completion status
-            if (futureResponse.isDone) Log.i(TAG, "processMultiPart: DONE")
-            if (futureResponse.isCancelled) Log.i(TAG, "processMultiPart: CANCELLED")
-        }
 
-        // Return the CompletableFuture
-        return futureResponse
+            response.exception?.let {
+                onComplete(null, response.exception)
+                return@launch
+            }
+
+            val body = client.getGsonInstance().deserializeBody<T>(response.body)
+
+            onComplete(Response(
+                code = response.code,
+                body = body,
+                headers = response.headers,
+                raw = response.body,
+                date = response.date,
+                permission = response.permission,
+                exception = if (body != null) null else JsonParseException("Deserialization error.")
+            ), null)
+        }
     }
 
     companion object {
