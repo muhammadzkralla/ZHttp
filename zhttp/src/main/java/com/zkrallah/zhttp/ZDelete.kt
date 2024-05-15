@@ -163,8 +163,8 @@ class ZDelete(val client: ZHttpClient) {
      */
     inline fun <reified T> processDelete(
         endpoint: String,
-        headers: List<Header>?,
         queries: List<Query>?,
+        headers: List<Header>?,
         crossinline onComplete: (success: Response<T>?, failure: Exception?) -> Unit
     ): Job {
         return CoroutineScope(Dispatchers.IO).launch {

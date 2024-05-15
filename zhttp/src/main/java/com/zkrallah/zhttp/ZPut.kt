@@ -179,8 +179,8 @@ class ZPut(val client: ZHttpClient) {
     inline fun <reified T> processPut(
         endpoint: String,
         requestBody: Any,
-        headers: List<Header>?,
         queries: List<Query>?,
+        headers: List<Header>?,
         crossinline onComplete: (success: Response<T>?, failure: Exception?) -> Unit
     ): Job {
         return CoroutineScope(Dispatchers.IO).launch {

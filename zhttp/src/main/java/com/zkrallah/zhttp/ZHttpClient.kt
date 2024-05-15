@@ -98,12 +98,12 @@ class ZHttpClient private constructor(builder: Builder) {
      */
     inline fun <reified T> get(
         endpoint: String,
-        headers: List<Header>?,
         queries: List<Query>?,
+        headers: List<Header>?,
         noinline onComplete: (success: Response<T>?, failure: Exception?) -> Unit
     ): Job {
         return ZGet(this).processGet(
-            endpoint, headers, queries, onComplete
+            endpoint, queries, headers, onComplete
         )
     }
 
@@ -134,12 +134,12 @@ class ZHttpClient private constructor(builder: Builder) {
     inline fun <reified T> post(
         endpoint: String,
         body: Any,
-        headers: List<Header>?,
         queries: List<Query>?,
+        headers: List<Header>?,
         noinline onComplete: (success: Response<T>?, failure: Exception?) -> Unit
     ): Job {
         return ZPost(this).processPost(
-            endpoint, body, headers, queries, onComplete
+            endpoint, body, queries, headers, onComplete
         )
     }
 
@@ -169,12 +169,12 @@ class ZHttpClient private constructor(builder: Builder) {
      */
     inline fun <reified T> delete(
         endpoint: String,
-        headers: List<Header>?,
         queries: List<Query>?,
+        headers: List<Header>?,
         noinline onComplete: (success: Response<T>?, failure: Exception?) -> Unit
     ): Job {
         return ZDelete(this).processDelete(
-            endpoint, headers, queries, onComplete
+            endpoint, queries, headers, onComplete
         )
     }
 
@@ -205,12 +205,12 @@ class ZHttpClient private constructor(builder: Builder) {
     inline fun <reified T> put(
         endpoint: String,
         body: Any,
-        headers: List<Header>?,
         queries: List<Query>?,
+        headers: List<Header>?,
         noinline onComplete: (success: Response<T>?, failure: Exception?) -> Unit
     ): Job {
         return ZPut(this).processPut(
-            endpoint, body, headers, queries, onComplete
+            endpoint, body, queries, headers, onComplete
         )
     }
 
@@ -242,12 +242,12 @@ class ZHttpClient private constructor(builder: Builder) {
     inline fun <reified T> patch(
         endpoint: String,
         body: Any,
-        headers: List<Header>?,
         queries: List<Query>?,
+        headers: List<Header>?,
         noinline onComplete: (success: Response<T>?, failure: Exception?) -> Unit
     ): Job {
         return ZPatch(this).processPatch(
-            endpoint, body, headers, queries, onComplete
+            endpoint, body, queries, headers, onComplete
         )
     }
 
