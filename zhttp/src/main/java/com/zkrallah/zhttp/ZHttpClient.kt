@@ -1,8 +1,7 @@
 package com.zkrallah.zhttp
 
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import java.util.concurrent.CompletableFuture
+import kotlinx.coroutines.Job
 
 /**
  * ZHttpClient class for customizing HTTP requests.
@@ -94,36 +93,17 @@ class ZHttpClient private constructor(builder: Builder) {
      * @param endpoint Endpoint to append to the base URL.
      * @param queries List of query parameters to include in the URL.
      * @param headers List of headers for the request.
-     * @param typeToken TypeToken for Gson deserialization.
-     * @param callback Callback for handling the HTTP response.
-     * @return CompletableFuture for the HTTP response or null.
-     */
-    fun <T> get(
-        endpoint: String,
-        queries: List<Query>?,
-        headers: List<Header>?,
-        typeToken: TypeToken<T>,
-        callback: ZListener<T>
-    ): CompletableFuture<HttpResponse?>? {
-        return ZGet(this).processGet(
-            endpoint, queries, headers, typeToken.type, callback
-        )
-    }
-
-    /**
-     * Initiate a GET request asynchronously with reified type parameter.
-     *
-     * @param endpoint Endpoint to append to the base URL.
-     * @param queries List of query parameters to include in the URL.
-     * @param headers List of headers for the request.
-     * @param callback Callback for handling the HTTP response.
-     * @return CompletableFuture for the HTTP response or null.
+     * @param onComplete Callback for handling the HTTP response.
+     * @return Job for the HTTP response or null.
      */
     inline fun <reified T> get(
-        endpoint: String, queries: List<Query>?, headers: List<Header>?, callback: ZListener<T>
-    ): CompletableFuture<HttpResponse?>? {
+        endpoint: String,
+        headers: List<Header>?,
+        queries: List<Query>?,
+        noinline onComplete: (success: Response<T>?, failure: Exception?) -> Unit
+    ): Job {
         return ZGet(this).processGet(
-            endpoint, queries, headers, object : TypeToken<T>() {}.type, callback
+            endpoint, headers, queries, onComplete
         )
     }
 
@@ -148,42 +128,18 @@ class ZHttpClient private constructor(builder: Builder) {
      * @param body Request body.
      * @param queries List of query parameters to include in the URL.
      * @param headers List of headers for the request.
-     * @param typeToken TypeToken for Gson deserialization.
-     * @param callback Callback for handling the HTTP response.
-     * @return CompletableFuture for the HTTP response or null.
-     */
-    fun <T> post(
-        endpoint: String,
-        body: Any,
-        queries: List<Query>?,
-        headers: List<Header>?,
-        typeToken: TypeToken<T>,
-        callback: ZListener<T>
-    ): CompletableFuture<HttpResponse?>? {
-        return ZPost(this).processPost(
-            endpoint, body, queries, headers, typeToken.type, callback
-        )
-    }
-
-    /**
-     * Initiate a POST request asynchronously with reified type parameter.
-     *
-     * @param endpoint Endpoint to append to the base URL.
-     * @param body Request body.
-     * @param queries List of query parameters to include in the URL.
-     * @param headers List of headers for the request.
-     * @param callback Callback for handling the HTTP response.
-     * @return CompletableFuture for the HTTP response or null.
+     * @param onComplete Callback for handling the HTTP response.
+     * @return Job for the HTTP response or null.
      */
     inline fun <reified T> post(
         endpoint: String,
         body: Any,
-        queries: List<Query>?,
         headers: List<Header>?,
-        callback: ZListener<T>
-    ): CompletableFuture<HttpResponse?>? {
+        queries: List<Query>?,
+        noinline onComplete: (success: Response<T>?, failure: Exception?) -> Unit
+    ): Job {
         return ZPost(this).processPost(
-            endpoint, body, queries, headers, object : TypeToken<T>() {}.type, callback
+            endpoint, body, headers, queries, onComplete
         )
     }
 
@@ -208,36 +164,17 @@ class ZHttpClient private constructor(builder: Builder) {
      * @param endpoint Endpoint to append to the base URL.
      * @param queries List of query parameters to include in the URL.
      * @param headers List of headers for the request.
-     * @param typeToken TypeToken for Gson deserialization.
-     * @param callback Callback for handling the HTTP response.
-     * @return CompletableFuture for the HTTP response or null.
-     */
-    fun <T> delete(
-        endpoint: String,
-        queries: List<Query>?,
-        headers: List<Header>?,
-        typeToken: TypeToken<T>,
-        callback: ZListener<T>
-    ): CompletableFuture<HttpResponse?>? {
-        return ZDelete(this).processDelete(
-            endpoint, queries, headers, typeToken.type, callback
-        )
-    }
-
-    /**
-     * Initiate a DELETE request asynchronously with reified type parameter.
-     *
-     * @param endpoint Endpoint to append to the base URL.
-     * @param queries List of query parameters to include in the URL.
-     * @param headers List of headers for the request.
-     * @param callback Callback for handling the HTTP response.
-     * @return CompletableFuture for the HTTP response or null.
+     * @param onComplete Callback for handling the HTTP response.
+     * @return Job for the HTTP response or null.
      */
     inline fun <reified T> delete(
-        endpoint: String, queries: List<Query>?, headers: List<Header>?, callback: ZListener<T>
-    ): CompletableFuture<HttpResponse?>? {
+        endpoint: String,
+        headers: List<Header>?,
+        queries: List<Query>?,
+        noinline onComplete: (success: Response<T>?, failure: Exception?) -> Unit
+    ): Job {
         return ZDelete(this).processDelete(
-            endpoint, queries, headers, object : TypeToken<T>() {}.type, callback
+            endpoint, headers, queries, onComplete
         )
     }
 
@@ -262,42 +199,18 @@ class ZHttpClient private constructor(builder: Builder) {
      * @param body Request body.
      * @param queries List of query parameters to include in the URL.
      * @param headers List of headers for the request.
-     * @param typeToken TypeToken for Gson deserialization.
-     * @param callback Callback for handling the HTTP response.
-     * @return CompletableFuture for the HTTP response or null.
-     */
-    fun <T> put(
-        endpoint: String,
-        body: Any,
-        queries: List<Query>?,
-        headers: List<Header>?,
-        typeToken: TypeToken<T>,
-        callback: ZListener<T>
-    ): CompletableFuture<HttpResponse?>? {
-        return ZPut(this).processPut(
-            endpoint, body, queries, headers, typeToken.type, callback
-        )
-    }
-
-    /**
-     * Initiate a PUT request asynchronously with reified type parameter.
-     *
-     * @param endpoint Endpoint to append to the base URL.
-     * @param body Request body.
-     * @param queries List of query parameters to include in the URL.
-     * @param headers List of headers for the request.
-     * @param callback Callback for handling the HTTP response.
-     * @return CompletableFuture for the HTTP response or null.
+     * @param onComplete Callback for handling the HTTP response.
+     * @return Job for the HTTP response or null.
      */
     inline fun <reified T> put(
         endpoint: String,
         body: Any,
-        queries: List<Query>?,
         headers: List<Header>?,
-        callback: ZListener<T>
-    ): CompletableFuture<HttpResponse?>? {
+        queries: List<Query>?,
+        noinline onComplete: (success: Response<T>?, failure: Exception?) -> Unit
+    ): Job {
         return ZPut(this).processPut(
-            endpoint, body, queries, headers, object : TypeToken<T>() {}.type, callback
+            endpoint, body, headers, queries, onComplete
         )
     }
 
@@ -323,42 +236,18 @@ class ZHttpClient private constructor(builder: Builder) {
      * @param body Request body.
      * @param queries List of query parameters to include in the URL.
      * @param headers List of headers for the request.
-     * @param typeToken TypeToken for Gson deserialization.
-     * @param callback Callback for handling the HTTP response.
-     * @return CompletableFuture for the HTTP response or null.
-     */
-    fun <T> patch(
-        endpoint: String,
-        body: Any,
-        queries: List<Query>?,
-        headers: List<Header>?,
-        typeToken: TypeToken<T>,
-        callback: ZListener<T>
-    ): CompletableFuture<HttpResponse?>? {
-        return ZPatch(this).processPatch(
-            endpoint, body, queries, headers, typeToken.type, callback
-        )
-    }
-
-    /**
-     * Initiate a PATCH request asynchronously with reified type parameter.
-     *
-     * @param endpoint Endpoint to append to the base URL.
-     * @param body Request body.
-     * @param queries List of query parameters to include in the URL.
-     * @param headers List of headers for the request.
-     * @param callback Callback for handling the HTTP response.
-     * @return CompletableFuture for the HTTP response or null.
+     * @param onComplete Callback for handling the HTTP response.
+     * @return Job for the HTTP response or null.
      */
     inline fun <reified T> patch(
         endpoint: String,
         body: Any,
-        queries: List<Query>?,
         headers: List<Header>?,
-        callback: ZListener<T>
-    ): CompletableFuture<HttpResponse?>? {
+        queries: List<Query>?,
+        noinline onComplete: (success: Response<T>?, failure: Exception?) -> Unit
+    ): Job {
         return ZPatch(this).processPatch(
-            endpoint, body, queries, headers, object : TypeToken<T>() {}.type, callback
+            endpoint, body, headers, queries, onComplete
         )
     }
 
@@ -384,42 +273,18 @@ class ZHttpClient private constructor(builder: Builder) {
      * @param parts List of multipart body parts.
      * @param queries List of query parameters to include in the URL.
      * @param headers List of headers for the request.
-     * @param typeToken TypeToken for Gson deserialization.
-     * @param callback Callback for handling the HTTP response.
-     * @return CompletableFuture for the HTTP response or null.
-     */
-    fun <T> multiPart(
-        endpoint: String,
-        parts: List<MultipartBody>,
-        queries: List<Query>?,
-        headers: List<Header>?,
-        typeToken: TypeToken<T>,
-        callback: ZListener<T>
-    ): CompletableFuture<HttpResponse?>? {
-        return ZMultipart(this).processMultiPart(
-            endpoint, parts, queries, headers, typeToken.type, callback
-        )
-    }
-
-    /**
-     * Initiate a multipart/form-data request asynchronously with reified type parameter.
-     *
-     * @param endpoint Endpoint to append to the base URL.
-     * @param parts List of multipart body parts.
-     * @param queries List of query parameters to include in the URL.
-     * @param headers List of headers for the request.
-     * @param callback Callback for handling the HTTP response.
-     * @return CompletableFuture for the HTTP response or null.
+     * @param onComplete Callback for handling the HTTP response.
+     * @return Job for the HTTP response or null.
      */
     inline fun <reified T> multiPart(
         endpoint: String,
         parts: List<MultipartBody>,
-        queries: List<Query>?,
         headers: List<Header>?,
-        callback: ZListener<T>
-    ): CompletableFuture<HttpResponse?>? {
+        queries: List<Query>?,
+        noinline onComplete: (success: Response<T>?, failure: Exception?) -> Unit
+    ): Job {
         return ZMultipart(this).processMultiPart(
-            endpoint, parts, queries, headers, object : TypeToken<T>() {}.type, callback
+            endpoint, parts, headers, queries, onComplete
         )
     }
 
