@@ -11,7 +11,8 @@ ZHttp is not built on any high-level or low-level networking or threading librar
 The only third-party library used is Google's `Gson` library for serialization/deserialization. <br><br>
 There are some useful settings you can customize in ZHttp. You can set default headers, connection and read time out periods, and buffer size for uploading files. 
 
-Refer to this [Demo](https://github.com/muhammadzkralla/ZHttp_Demo "Demo") for an example.
+Refer to this [Demo](https://github.com/muhammadzkralla/ZHttp_Demo "Demo") for a simple example.
+Refer to this [Demo](https://github.com/muhammadzkralla/Z-Students "Demo") for an actual app example.
 
 ## Features
 
