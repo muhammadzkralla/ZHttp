@@ -98,8 +98,8 @@ class ZHttpClient private constructor(builder: Builder) {
      */
     inline fun <reified T> get(
         endpoint: String,
-        queries: List<Query>?,
-        headers: List<Header>?,
+        queries: List<Query>? = null,
+        headers: List<Header>? = null,
         noinline onComplete: (success: Response<T>?, failure: Exception?) -> Unit
     ): Job {
         return ZGet(this).processGet(
@@ -116,7 +116,7 @@ class ZHttpClient private constructor(builder: Builder) {
      * @return A [Response] object containing the result of the GET request, or `null` if an error occurs.
      */
     suspend inline fun <reified T> get(
-        endpoint: String, queries: List<Query>?, headers: List<Header>?
+        endpoint: String, queries: List<Query>? = null, headers: List<Header>? = null
     ): Response<T>? {
         return ZGet(this).processGet(endpoint, queries, headers)
     }
@@ -134,8 +134,8 @@ class ZHttpClient private constructor(builder: Builder) {
     inline fun <reified T> post(
         endpoint: String,
         body: Any,
-        queries: List<Query>?,
-        headers: List<Header>?,
+        queries: List<Query>? = null,
+        headers: List<Header>? = null,
         noinline onComplete: (success: Response<T>?, failure: Exception?) -> Unit
     ): Job {
         return ZPost(this).processPost(
@@ -153,7 +153,7 @@ class ZHttpClient private constructor(builder: Builder) {
      * @return A [Response] object containing the result of the POST request, or `null` if an error occurs.
      */
     suspend inline fun <reified T> post(
-        endpoint: String, body: Any, queries: List<Query>?, headers: List<Header>?
+        endpoint: String, body: Any, queries: List<Query>? = null, headers: List<Header>? = null
     ): Response<T>? {
         return ZPost(this).processPost(endpoint, body, queries, headers)
     }
@@ -169,8 +169,8 @@ class ZHttpClient private constructor(builder: Builder) {
      */
     inline fun <reified T> delete(
         endpoint: String,
-        queries: List<Query>?,
-        headers: List<Header>?,
+        queries: List<Query>? = null,
+        headers: List<Header>? = null,
         noinline onComplete: (success: Response<T>?, failure: Exception?) -> Unit
     ): Job {
         return ZDelete(this).processDelete(
@@ -187,7 +187,7 @@ class ZHttpClient private constructor(builder: Builder) {
      * @return A [Response] object containing the result of the DELETE request, or `null` if an error occurs.
      */
     suspend inline fun <reified T> delete(
-        endpoint: String, queries: List<Query>?, headers: List<Header>?
+        endpoint: String, queries: List<Query>? = null, headers: List<Header>? = null
     ): Response<T>? {
         return ZDelete(this).processDelete(endpoint, queries, headers)
     }
@@ -205,8 +205,8 @@ class ZHttpClient private constructor(builder: Builder) {
     inline fun <reified T> put(
         endpoint: String,
         body: Any,
-        queries: List<Query>?,
-        headers: List<Header>?,
+        queries: List<Query>? = null,
+        headers: List<Header>? = null,
         noinline onComplete: (success: Response<T>?, failure: Exception?) -> Unit
     ): Job {
         return ZPut(this).processPut(
@@ -224,7 +224,7 @@ class ZHttpClient private constructor(builder: Builder) {
      * @return A [Response] object containing the result of the PUT request, or `null` if an error occurs.
      */
     suspend inline fun <reified T> put(
-        endpoint: String, body: Any, queries: List<Query>?, headers: List<Header>?
+        endpoint: String, body: Any, queries: List<Query>? = null, headers: List<Header>? = null
     ): Response<T>? {
         return ZPut(this).processPut(endpoint, body, queries, headers)
     }
@@ -242,8 +242,8 @@ class ZHttpClient private constructor(builder: Builder) {
     inline fun <reified T> patch(
         endpoint: String,
         body: Any,
-        queries: List<Query>?,
-        headers: List<Header>?,
+        queries: List<Query>? = null,
+        headers: List<Header>? = null,
         noinline onComplete: (success: Response<T>?, failure: Exception?) -> Unit
     ): Job {
         return ZPatch(this).processPatch(
@@ -261,7 +261,7 @@ class ZHttpClient private constructor(builder: Builder) {
      * @return A [Response] object containing the result of the PATCH request, or `null` if an error occurs.
      */
     suspend inline fun <reified T> patch(
-        endpoint: String, body: Any, queries: List<Query>?, headers: List<Header>?
+        endpoint: String, body: Any, queries: List<Query>? = null, headers: List<Header>? = null
     ): Response<T>? {
         return ZPatch(this).processPatch(endpoint, body, queries, headers)
     }
@@ -279,8 +279,8 @@ class ZHttpClient private constructor(builder: Builder) {
     inline fun <reified T> multiPart(
         endpoint: String,
         parts: List<MultipartBody>,
-        headers: List<Header>?,
-        queries: List<Query>?,
+        headers: List<Header>? = null,
+        queries: List<Query>? = null,
         noinline onComplete: (success: Response<T>?, failure: Exception?) -> Unit
     ): Job {
         return ZMultipart(this).processMultiPart(
@@ -298,7 +298,10 @@ class ZHttpClient private constructor(builder: Builder) {
      * @return A [Response] object containing the result of the multi-part request, or `null` if an error occurs.
      */
     suspend inline fun <reified T> multiPart(
-        endpoint: String, parts: List<MultipartBody>, queries: List<Query>?, headers: List<Header>?
+        endpoint: String,
+        parts: List<MultipartBody>,
+        queries: List<Query>? = null,
+        headers: List<Header>? = null
     ): Response<T>? {
         return ZMultipart(this).processMultiPart(endpoint, parts, queries, headers)
     }
