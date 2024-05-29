@@ -317,7 +317,7 @@ class ZHttpClient private constructor(builder: Builder) {
         private var baseUrl = ""
         private var connectionTimeout = 20000
         private var readTimeout = 20000
-        private var defaultHeaders = listOf(
+        private var defaultHeaders = mutableListOf(
             Header("Content-Type", "application/json")
         )
         private var filesBufferSize = 1024
@@ -372,7 +372,7 @@ class ZHttpClient private constructor(builder: Builder) {
          * @return This builder instance for method chaining.
          */
         fun defaultHeaders(headers: List<Header>): Builder {
-            defaultHeaders = headers
+            defaultHeaders = headers.toMutableList()
             return this
         }
 
@@ -384,6 +384,17 @@ class ZHttpClient private constructor(builder: Builder) {
          */
         fun filesBufferSize(bufferSize: Int): Builder {
             filesBufferSize = bufferSize
+            return this
+        }
+
+        /**
+         * Set the authentication token for the the HTTP client.
+         *
+         * @param bearerToken The authentication token to be set.
+         * @return This builder instance for method chaining+.
+         */
+        fun authenticated(bearerToken: BearerToken): Builder {
+            defaultHeaders.add(Header("Authorization", "Bearer $bearerToken"))
             return this
         }
 
