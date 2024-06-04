@@ -410,7 +410,7 @@ class ZHttpClient private constructor(builder: Builder) {
         fun authenticated(basicToken: Basic): Builder {
             val credentials = "${basicToken.username}:${basicToken.password}"
             val header = Base64.encode(credentials.toByteArray())
-            defaultHeaders.add(Header("Authorization", "Bearer $header"))
+            defaultHeaders.add(Header("Authorization", "Basic $header"))
             return this
         }
 
