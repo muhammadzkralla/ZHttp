@@ -2,6 +2,8 @@ package com.zkrallah.zhttp
 
 import com.google.gson.Gson
 import kotlinx.coroutines.Job
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 /**
  * ZHttpClient class for customizing HTTP requests.
@@ -391,10 +393,24 @@ class ZHttpClient private constructor(builder: Builder) {
          * Set the authentication token for the the HTTP client.
          *
          * @param bearerToken The authentication token to be set.
-         * @return This builder instance for method chaining+.
+         * @return This builder instance for method chaining.
          */
-        fun authenticated(bearerToken: BearerToken): Builder {
-            defaultHeaders.add(Header("Authorization", "Bearer $bearerToken"))
+        fun authenticated(bearerToken: Bearer): Builder {
+            defaultHeaders.add(Header("Authorization", "Bearer ${bearerToken.token}"))
+            return this
+        }
+
+        /**
+         * Set the authentication token for the the HTTP client.
+         *
+         * @param basicToken The authentication token to be set.
+         * @return This builder instance for method chaining.
+         */
+        @OptIn(ExperimentalEncodingApi::class)
+        fun authenticated(basicToken: Basic): Builder {
+            val credentials = "${basicToken.username}:${basicToken.password}"
+            val header = Base64.encode(credentials.toByteArray())
+            defaultHeaders.add(Header("Authorization", "Bearer $header"))
             return this
         }
 

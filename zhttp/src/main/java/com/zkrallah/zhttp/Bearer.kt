@@ -5,6 +5,6 @@ package com.zkrallah.zhttp
  *
  * @property token The bearer token.
  */
-data class BearerToken(
+data class Bearer(
     val token: String
 )
