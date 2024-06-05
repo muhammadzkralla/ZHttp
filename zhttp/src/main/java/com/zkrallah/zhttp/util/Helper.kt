@@ -1,4 +1,4 @@
-package com.zkrallah.zhttp
+package com.zkrallah.zhttp.util
 
 import android.util.Log
 import com.google.gson.Gson

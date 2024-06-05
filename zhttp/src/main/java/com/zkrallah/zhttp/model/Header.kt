@@ -1,4 +1,4 @@
-package com.zkrallah.zhttp
+package com.zkrallah.zhttp.model
 
 /**
  * Represents an HTTP header consisting of a key-value pair.

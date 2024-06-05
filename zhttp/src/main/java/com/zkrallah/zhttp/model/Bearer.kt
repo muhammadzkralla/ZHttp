@@ -1,4 +1,4 @@
-package com.zkrallah.zhttp
+package com.zkrallah.zhttp.model
 
 /**
  * Represents a bearer token header.

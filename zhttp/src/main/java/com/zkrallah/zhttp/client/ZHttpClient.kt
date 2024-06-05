@@ -1,6 +1,18 @@
-package com.zkrallah.zhttp
+package com.zkrallah.zhttp.client
 
 import com.google.gson.Gson
+import com.zkrallah.zhttp.model.Basic
+import com.zkrallah.zhttp.model.Bearer
+import com.zkrallah.zhttp.model.Header
+import com.zkrallah.zhttp.model.MultipartBody
+import com.zkrallah.zhttp.model.Query
+import com.zkrallah.zhttp.model.Response
+import com.zkrallah.zhttp.core.ZDelete
+import com.zkrallah.zhttp.core.ZMultipart
+import com.zkrallah.zhttp.core.ZPatch
+import com.zkrallah.zhttp.core.ZPost
+import com.zkrallah.zhttp.core.ZPut
+import com.zkrallah.zhttp.core.ZGet
 import kotlinx.coroutines.Job
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
