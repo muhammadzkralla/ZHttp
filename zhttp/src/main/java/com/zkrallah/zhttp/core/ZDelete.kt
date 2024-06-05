@@ -1,8 +1,14 @@
-package com.zkrallah.zhttp
+package com.zkrallah.zhttp.core
 
 import android.util.Log
 import com.google.gson.JsonParseException
-import com.zkrallah.zhttp.Helper.deserializeBody
+import com.zkrallah.zhttp.util.Helper.deserializeBody
+import com.zkrallah.zhttp.client.ZHttpClient
+import com.zkrallah.zhttp.model.Header
+import com.zkrallah.zhttp.model.HttpResponse
+import com.zkrallah.zhttp.model.Query
+import com.zkrallah.zhttp.model.Response
+import com.zkrallah.zhttp.util.UrlEncoderUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers

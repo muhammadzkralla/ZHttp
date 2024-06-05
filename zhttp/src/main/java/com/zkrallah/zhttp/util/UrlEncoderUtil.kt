@@ -1,5 +1,6 @@
-package com.zkrallah.zhttp
+package com.zkrallah.zhttp.util
 
+import com.zkrallah.zhttp.model.Query
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 

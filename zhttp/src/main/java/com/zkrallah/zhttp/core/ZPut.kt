@@ -1,8 +1,14 @@
-package com.zkrallah.zhttp
+package com.zkrallah.zhttp.core
 
 import android.util.Log
 import com.google.gson.JsonParseException
-import com.zkrallah.zhttp.Helper.deserializeBody
+import com.zkrallah.zhttp.util.Helper.deserializeBody
+import com.zkrallah.zhttp.client.ZHttpClient
+import com.zkrallah.zhttp.model.Header
+import com.zkrallah.zhttp.model.HttpResponse
+import com.zkrallah.zhttp.model.Query
+import com.zkrallah.zhttp.model.Response
+import com.zkrallah.zhttp.util.UrlEncoderUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -17,14 +23,14 @@ import java.net.SocketTimeoutException
 import java.net.URL
 
 /**
- * ZPost class for handling POST HTTP requests.
+ * ZPut class for handling PUT HTTP requests.
  *
  * @param client ZHttpClient instance of the client.
  */
-class ZPost(val client: ZHttpClient) {
+class ZPut(val client: ZHttpClient) {
 
     /**
-     * Executes a raw POST HTTP request synchronously.
+     * Executes a raw PUT HTTP request synchronously.
      *
      * @param endpoint Endpoint to append to the base URL.
      * @param requestBody Body of the request.
@@ -34,7 +40,7 @@ class ZPost(val client: ZHttpClient) {
      */
     @Synchronized
     @Throws(Exception::class)
-    fun doPost(
+    fun doPut(
         endpoint: String, requestBody: Any, queries: List<Query>?, headers: List<Header>?
     ): HttpResponse? {
         // Build the full URL with endpoint and query parameters
@@ -47,8 +53,8 @@ class ZPost(val client: ZHttpClient) {
         connection.readTimeout = client.getReadTimeout()
 
         return try {
-            // Set the request method to POST
-            connection.requestMethod = POST
+            // Set the request method to PUT
+            connection.requestMethod = PUT
             connection.doOutput = true
 
             // Add default headers from the ZHttpClient
@@ -80,11 +86,11 @@ class ZPost(val client: ZHttpClient) {
                 }
             } catch (e: SocketTimeoutException) {
                 // If a socket timeout occurs, return an HttpResponse with the exception
-                Log.e(TAG, "doPost: $e", e)
+                Log.e(TAG, "doPut: $e", e)
                 return HttpResponse(exception = e)
             } catch (e: Exception) {
                 // If there's an error, read the error stream for additional information
-                Log.e(TAG, "doPost: $e", e)
+                Log.e(TAG, "doPut: $e", e)
                 BufferedReader(InputStreamReader(connection.errorStream)).use { reader ->
                     var line: String?
                     while (reader.readLine().also { line = it } != null) response.append(line)
@@ -101,7 +107,7 @@ class ZPost(val client: ZHttpClient) {
             )
         } catch (e: Exception) {
             // If an exception occurs, log the error and return an HttpResponse with the exception
-            Log.e(TAG, "doPost: $e", e)
+            Log.e(TAG, "doPut: $e", e)
             HttpResponse(exception = e)
         } finally {
             // Disconnect the connection when done
@@ -110,23 +116,23 @@ class ZPost(val client: ZHttpClient) {
     }
 
     /**
-     * Performs a suspended POST HTTP request asynchronously, returning a [Deferred] object containing the result.
+     * Performs a suspended PUT HTTP request asynchronously, returning a [Deferred] object containing the result.
      *
-     * @param endpoint The endpoint URL to send the POST request to.
-     * @param requestBody The request body to include in the POST request.
+     * @param endpoint The endpoint URL to send the PUT request to.
+     * @param requestBody The request body to include in the PUT request.
      * @param queries The list of query parameters to include in the request.
      * @param headers The list of headers to include in the request.
-     * @return A [Deferred] object containing the result of the POST request.
+     * @return A [Deferred] object containing the result of the PUT request.
      */
-    suspend fun doSuspendedPostRequest(
+    suspend fun doSuspendedPutRequest(
         endpoint: String, requestBody: Any, queries: List<Query>?, headers: List<Header>?
     ): Deferred<HttpResponse?> {
         return withContext(Dispatchers.IO) {
             async {
                 try {
-                    doPost(endpoint, requestBody, queries, headers)
+                    doPut(endpoint, requestBody, queries, headers)
                 } catch (e: Exception) {
-                    Log.e(TAG, "doSuspendedPostRequest: $e", e)
+                    Log.e(TAG, "doSuspendedPutRequest: $e", e)
                     val response = HttpResponse(exception = e)
                     response
                 }
@@ -135,22 +141,22 @@ class ZPost(val client: ZHttpClient) {
     }
 
     /**
-     * Processes a POST HTTP request asynchronously.
+     * Processes a PUT HTTP request asynchronously.
      *
-     * @param endpoint The endpoint URL to send the POST request to.
-     * @param requestBody The request body to include in the POST request.
+     * @param endpoint The endpoint URL to send the PUT request to.
+     * @param requestBody The request body to include in the PUT request.
      * @param queries The list of query parameters to include in the request.
      * @param headers The list of headers to include in the request.
-     * @return A [Response] object containing the result of the POST request, or `null` if an error occurs.
+     * @return A [Response] object containing the result of the PUT request, or `null` if an error occurs.
      */
-    suspend inline fun <reified T> processPost(
+    suspend inline fun <reified T> processPut(
         endpoint: String, requestBody: Any, queries: List<Query>?, headers: List<Header>?
     ): Response<T>? {
         val response =
-            doSuspendedPostRequest(endpoint, requestBody, queries, headers).await() ?: return null
+            doSuspendedPutRequest(endpoint, requestBody, queries, headers).await() ?: return null
 
         response.exception?.let {
-            Log.e("ZPost", "processPost: $it", it)
+            Log.e("ZPut", "processPut: $it", it)
         }
 
         val body = client.getGsonInstance().deserializeBody<T>(response.body)
@@ -167,7 +173,7 @@ class ZPost(val client: ZHttpClient) {
     }
 
     /**
-     * Process a POST HTTP request with callback for the response.
+     * Process a PUT HTTP request with callback for the response.
      *
      * @param endpoint Endpoint to append to the base URL.
      * @param requestBody Body of the request.
@@ -176,7 +182,7 @@ class ZPost(val client: ZHttpClient) {
      * @param onComplete Callback to handle the HttpResponse or an exception.
      * @return Job that will be completed with the HttpResponse or an exception.
      */
-    inline fun <reified T> processPost(
+    inline fun <reified T> processPut(
         endpoint: String,
         requestBody: Any,
         queries: List<Query>?,
@@ -184,7 +190,7 @@ class ZPost(val client: ZHttpClient) {
         crossinline onComplete: (success: Response<T>?, failure: Exception?) -> Unit
     ): Job {
         return CoroutineScope(Dispatchers.IO).launch {
-            val response = doSuspendedPostRequest(endpoint, requestBody, queries, headers).await()
+            val response = doSuspendedPutRequest(endpoint, requestBody, queries, headers).await()
 
             if (response?.code == null) {
                 onComplete(null, NullPointerException("Could not make request."))
@@ -211,7 +217,7 @@ class ZPost(val client: ZHttpClient) {
     }
 
     companion object {
-        private const val TAG = "ZPost"
-        private const val POST = "POST"
+        private const val TAG = "ZPut"
+        private const val PUT = "PUT"
     }
 }

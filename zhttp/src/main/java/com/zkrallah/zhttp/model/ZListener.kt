@@ -1,4 +1,4 @@
-package com.zkrallah.zhttp
+package com.zkrallah.zhttp.model
 
 /**
  * Interface for handling asynchronous HTTP requests.
