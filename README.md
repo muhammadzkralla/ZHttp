@@ -18,10 +18,11 @@ There are some useful settings you can customize in ZHttp. You can set default h
 
 • Beginner-friendly & simple to use <br>
 • Thread-safe & type-safe <br>
-• Asynchronous/synchronous <br>
-• Handles serialization/deserialization <br>
+• Supports both asynchronous and synchronous requests <br>
+• Handles serialization and deserialization <br>
 • Has cancellation strategy <br>
-• Customizable <br>
+• Auto-injects Basic/Bearer authentication headers <br>
+• Highly customizable <br>
 • Supports `GET`, `POST`, `DELETE`, `PUT`, `PATCH`, and `MULTIPART` requests <br> <br>
 
 ## Installation
@@ -42,7 +43,7 @@ dependencyResolutionManagement {
 ```gradle
 // Add this dependency to your build.gradle.kts (module) :
 dependencies {
-      implementation("com.github.muhammadzkralla:ZHttp:2.1")
+      implementation("com.github.muhammadzkralla:ZHttp:2.3")
 }
 ```
 
@@ -124,6 +125,29 @@ val client = ZHttpClient.Builder()
             .readTimeout(20000)
             .defaultHeaders(defaultHeaders)
             .filesBufferSize(8 * 1024)
+            .build()
+
+```
+
+You can also specify authentication headers to automatically inject them into each request with the client : <br> 
+
+```kotlin
+// Setting the connection and the read time out periods to 20 seconds.
+// Assigning some default headers to be included in each request.
+// Setting the buffer size for file uploading in MULTIPART requests to 8 KB.
+val defaultHeaders = listOf(
+            Header("Content-Type", "application/json; charset=UTF-8"),
+            Header("Authorization", "Bearer $token")
+)
+
+val client = ZHttpClient.Builder()
+            .baseUrl(BASE_URL)
+            .connectionTimeout(20000)
+            .readTimeout(20000)
+            .defaultHeaders(defaultHeaders)
+            .filesBufferSize(8 * 1024)
+            .authenticated(Bearer("token")) // Bearer auth
+            .authenticated(Basic("foo", "bar")) // Basic auth
             .build()
 
 ```
