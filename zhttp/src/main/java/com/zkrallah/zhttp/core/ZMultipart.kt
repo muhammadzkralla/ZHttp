@@ -85,12 +85,15 @@ class ZMultipart(val client: ZHttpClient) {
                     part.contentType?.let { outputStream.writeBytes("Content-Type: $it\r\n") }
                     outputStream.writeBytes("\r\n")
 
-                    outputStream.write(requestBody.toByteArray())
+                    // Serialize the request body to JSON
+                    val body = client.getGsonInstance().toJson(requestBody)
+
+                    outputStream.write(body.toByteArray())
                 }
 
                 // If the multipart is a file
                 part.filePath?.let { filePath ->
-                    outputStream.writeBytes("Content-Disposition: form-data; name=\"${part.fileName}\"; filename=\"$filePath\"\r\n")
+                    outputStream.writeBytes("Content-Disposition: form-data; name=\"${part.name}\"; filename=\"$filePath\"\r\n")
                     part.contentType?.let { outputStream.writeBytes("Content-Type: $it\r\n") }
                     outputStream.writeBytes("\r\n")
 
