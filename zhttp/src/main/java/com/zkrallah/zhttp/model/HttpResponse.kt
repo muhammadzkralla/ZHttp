@@ -19,5 +19,5 @@ data class HttpResponse(
     val headers: Map<String, List<String>>? = null,
     val date: Long? = null,
     val permission: Permission? = null,
-    val exception: Exception? = null
+    var exception: Exception? = null
 )

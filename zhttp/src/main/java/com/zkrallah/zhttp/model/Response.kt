@@ -21,5 +21,5 @@ data class Response<T>(
     val raw: String? = null,
     val date: Long? = null,
     val permission: Permission? = null,
-    val exception: Exception? = null
+    var exception: Exception? = null
 )
