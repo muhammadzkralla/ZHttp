@@ -43,7 +43,7 @@ dependencyResolutionManagement {
 ```gradle
 // Add this dependency to your build.gradle.kts (module) :
 dependencies {
-      implementation("com.github.muhammadzkralla:ZHttp:2.3")
+      implementation("com.github.muhammadzkralla:ZHttp:2.4")
 }
 ```
 
@@ -338,15 +338,9 @@ val patchRequest = client.patch<TYPE>(ENDPOINT, ARG, QUERIES, HEADERS) { success
 
 <h1 align = "center"> Asynchronous MULTIPART </h1> <br>
 
-To make a `MULTIPART` request, there's actually one or two extra steps according to the type of the part you would like to post. <br> <br>
-In case of a normal object / list / map / set or any serializable part, you should first serialize it yourself, for example :
+To make a `MULTIPART` request using ZHttp, here's an example of the syntax :
 
- ```kotlin
-// Serialization of an object.
-val obj = Gson().toJson(YOUR_OBJECT)
-```
-
-The second step is to make a `MultipartBody` of the serialized object :
+In case of an object part, you should make a `MultipartBody` of the object :
 
 ```kotlin
 // Making a MultipartBody of a serializable object.
@@ -357,25 +351,25 @@ val objectMultiPartBody = MultipartBody(
 )
 ```
 
-In case of a file part, you should just make a `MultipartBody` of the file :
+In case of a file part, you should make a `MultipartBody` of the file :
 
 ```kotlin
 // Making a MultipartBody of a file.
 val imageMultipartBody = MultipartBody(
-                        fileName = "FILE_NAME (REQUIRED)",
+                        name = "FILE_NAME (REQUIRED)",
                         filePath = "FILE_PATH",
-                        contentType = "image/jpeg"
+                        contentType = "image/*"
 )
 ```
 
-> **Note:** The name and fileName are not optional, they must be provided, however, they are not required to have a specific value,
-> if they are not important to you or you just don't know what to name them, use any descriptive names.
+> **Note:** The name is not optional, it must be provided as it identifies the part sent to the server side, however, it is not required to have a specific value,
+> if it is not important to you or you just don't know what to name it, use any descriptive name.
 
 After you make all your `MultipartBody` objects, you should now add them in a list :
 
 ```kotlin
 // Add all your parts in a list.
-val parts = listOf(objectMultiPartBody, imageMultipartBody)
+val PARTS = listOf(objectMultiPartBody, imageMultipartBody)
 ```
 
 Finally create the `MULTIPART` request itself :
@@ -384,7 +378,7 @@ Finally create the `MULTIPART` request itself :
 
 ```kotlin
 // The syntax of a MULTIPART request.
-val response = client.multiPart<TYPE>(ENDPOINT, parts, QUERIES, HEADERS)
+val response = client.multiPart<TYPE>(ENDPOINT, PARTS, QUERIES, HEADERS)
 ```
 
 It will return you a `response` of the specified `TYPE`
@@ -400,18 +394,19 @@ val multipart = client.multiPart<TYPE>(ENDPOINT, PARTS, QUERIES, HEADERS) { succ
 
 > **Note:** `HEADERS`, `QUERIES`, `TYPE`, logging messages, and cancellation strategy follow the same rules as in the `GET` request.
 
-> **CRUCIAL:** Please do not attempt to make a `MultipartBody` with both `name`, `body` and `fileName`, `filePath` in the same object, for example :
+> **CRUCIAL:** Please do not attempt to make a `MultipartBody` with both `body` and `filePath` in the same object, for example :
 
 ```kotlin
 // DO NOT MAKE THIS :
 val badMultiPartBody = MultipartBody(
                     name = "NAME (REQUIRED)",
                     body = obj,
-                    fileName = "FILE_NAME (REQUIRED)",
                     filePath = "FILE_PATH",
                     contentType = "application/json"
 )
 ```
+
+> As `MultipartBody` is designed to contain the data of only one part, either an object, or a file. 
 
 <h1 align = "center">  Manual Mode </h1> <br>
 
