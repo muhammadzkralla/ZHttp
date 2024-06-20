@@ -36,10 +36,10 @@ object Helper {
             this.fromJson<T>(body)
         } catch (e: JsonParseException) {
             if (T::class.java == String::class.java) body as T
-            else null
+            else throw JsonParseException("Failed to deserialize body.")
         } catch (e: Exception) {
             Log.e("ZHttp", "deserializeBody: $e", e)
-            null
+            throw JsonParseException("Failed to deserialize body.")
         }
     }
 }

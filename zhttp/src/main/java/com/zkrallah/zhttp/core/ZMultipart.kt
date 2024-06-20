@@ -1,14 +1,13 @@
 package com.zkrallah.zhttp.core
 
 import android.util.Log
-import com.google.gson.JsonParseException
-import com.zkrallah.zhttp.util.Helper.deserializeBody
 import com.zkrallah.zhttp.client.ZHttpClient
 import com.zkrallah.zhttp.model.Header
 import com.zkrallah.zhttp.model.HttpResponse
 import com.zkrallah.zhttp.model.MultipartBody
 import com.zkrallah.zhttp.model.Query
 import com.zkrallah.zhttp.model.Response
+import com.zkrallah.zhttp.util.Helper.deserializeBody
 import com.zkrallah.zhttp.util.UrlEncoderUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -191,7 +190,12 @@ class ZMultipart(val client: ZHttpClient) {
             Log.e("ZMultipart", "processMultiPart: $it", it)
         }
 
-        val body = client.getGsonInstance().deserializeBody<T>(response.body)
+        val body = try {
+            client.getGsonInstance().deserializeBody<T>(response.body)
+        } catch (e: Exception) {
+            if (response.exception == null) response.exception = e
+            null
+        }
 
         return Response(
             code = response.code,
@@ -234,7 +238,12 @@ class ZMultipart(val client: ZHttpClient) {
                 return@launch
             }
 
-            val body = client.getGsonInstance().deserializeBody<T>(response.body)
+            val body = try {
+                client.getGsonInstance().deserializeBody<T>(response.body)
+            } catch (e: Exception) {
+                if (response.exception == null) response.exception = e
+                null
+            }
 
             onComplete(Response(
                 code = response.code,
@@ -243,7 +252,7 @@ class ZMultipart(val client: ZHttpClient) {
                 raw = response.body,
                 date = response.date,
                 permission = response.permission,
-                exception = if (body != null) null else JsonParseException("Deserialization error.")
+                exception = response.exception
             ), null)
         }
     }

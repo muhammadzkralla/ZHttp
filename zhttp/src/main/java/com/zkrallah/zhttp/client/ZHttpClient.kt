@@ -1,5 +1,6 @@
 package com.zkrallah.zhttp.client
 
+import android.util.Log
 import com.google.gson.Gson
 import com.zkrallah.zhttp.model.Basic
 import com.zkrallah.zhttp.model.Bearer
@@ -13,7 +14,9 @@ import com.zkrallah.zhttp.core.ZPatch
 import com.zkrallah.zhttp.core.ZPost
 import com.zkrallah.zhttp.core.ZPut
 import com.zkrallah.zhttp.core.ZGet
+import com.zkrallah.zhttp.model.RequestRetryMechanism
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
@@ -30,6 +33,7 @@ class ZHttpClient private constructor(builder: Builder) {
     private var defaultHeaders = builder.getDefaultHeaders()
     private val filesBufferSize = builder.getBufferSize()
     private val gson = Gson()
+    val requestRetryMechanism = builder.getRequestRetryMechanism()
 
     /**
      * Get the base URL of the client.
@@ -74,6 +78,15 @@ class ZHttpClient private constructor(builder: Builder) {
      */
     internal fun getBufferSize(): Int {
         return filesBufferSize
+    }
+
+    /**
+     * Get the request retry mechanism.
+     *
+     * @return RequestRetryMechanism instance.
+     */
+    internal fun getRequestRetryMechanism(): RequestRetryMechanism? {
+        return requestRetryMechanism
     }
 
     /**
@@ -132,7 +145,17 @@ class ZHttpClient private constructor(builder: Builder) {
     suspend inline fun <reified T> get(
         endpoint: String, queries: List<Query>? = null, headers: List<Header>? = null
     ): Response<T>? {
-        return ZGet(this).processGet(endpoint, queries, headers)
+        return if (requestRetryMechanism == null) {
+            ZGet(this).processGet(endpoint, queries, headers)
+        } else {
+            executeWithRetryMechanism("get") {
+                ZGet(this).processGet<T>(
+                    endpoint,
+                    queries,
+                    headers
+                )
+            }
+        }
     }
 
     /**
@@ -169,7 +192,18 @@ class ZHttpClient private constructor(builder: Builder) {
     suspend inline fun <reified T> post(
         endpoint: String, body: Any, queries: List<Query>? = null, headers: List<Header>? = null
     ): Response<T>? {
-        return ZPost(this).processPost(endpoint, body, queries, headers)
+        return if (requestRetryMechanism == null) {
+            ZPost(this).processPost(endpoint, body, queries, headers)
+        } else {
+            executeWithRetryMechanism("post") {
+                ZPost(this).processPost<T>(
+                    endpoint,
+                    body,
+                    queries,
+                    headers
+                )
+            }
+        }
     }
 
     /**
@@ -203,7 +237,17 @@ class ZHttpClient private constructor(builder: Builder) {
     suspend inline fun <reified T> delete(
         endpoint: String, queries: List<Query>? = null, headers: List<Header>? = null
     ): Response<T>? {
-        return ZDelete(this).processDelete(endpoint, queries, headers)
+        return if (requestRetryMechanism == null) {
+            ZDelete(this).processDelete(endpoint, queries, headers)
+        } else {
+            executeWithRetryMechanism("delete") {
+                ZDelete(this).processDelete<T>(
+                    endpoint,
+                    queries,
+                    headers
+                )
+            }
+        }
     }
 
     /**
@@ -240,7 +284,18 @@ class ZHttpClient private constructor(builder: Builder) {
     suspend inline fun <reified T> put(
         endpoint: String, body: Any, queries: List<Query>? = null, headers: List<Header>? = null
     ): Response<T>? {
-        return ZPut(this).processPut(endpoint, body, queries, headers)
+        return if (requestRetryMechanism == null) {
+            ZPut(this).processPut(endpoint, body, queries, headers)
+        } else {
+            executeWithRetryMechanism("put") {
+                ZPut(this).processPut<T>(
+                    endpoint,
+                    body,
+                    queries,
+                    headers
+                )
+            }
+        }
     }
 
     /**
@@ -277,7 +332,18 @@ class ZHttpClient private constructor(builder: Builder) {
     suspend inline fun <reified T> patch(
         endpoint: String, body: Any, queries: List<Query>? = null, headers: List<Header>? = null
     ): Response<T>? {
-        return ZPatch(this).processPatch(endpoint, body, queries, headers)
+        return if (requestRetryMechanism == null) {
+            ZPatch(this).processPatch(endpoint, body, queries, headers)
+        } else {
+            executeWithRetryMechanism("patch") {
+                ZPatch(this).processPatch<T>(
+                    endpoint,
+                    body,
+                    queries,
+                    headers
+                )
+            }
+        }
     }
 
     /**
@@ -317,7 +383,58 @@ class ZHttpClient private constructor(builder: Builder) {
         queries: List<Query>? = null,
         headers: List<Header>? = null
     ): Response<T>? {
-        return ZMultipart(this).processMultiPart(endpoint, parts, queries, headers)
+        return if (requestRetryMechanism == null) {
+            ZMultipart(this).processMultiPart(endpoint, parts, queries, headers)
+        } else {
+            executeWithRetryMechanism("multiPart") {
+                ZMultipart(this).processMultiPart<T>(
+                    endpoint,
+                    parts,
+                    queries,
+                    headers
+                )
+            }
+        }
+    }
+
+    /**
+     * Performs an HTTP request asynchronously with retrial mechanism, returning a [Response] object containing the result.
+     *
+     * @param type The type of the HTTP request.
+     * @param requestBlock The block to execute for the HTTP request.
+     */
+    suspend inline fun <reified T> executeWithRetryMechanism(
+        type: String,
+        crossinline requestBlock: suspend () -> Response<T>?
+    ): Response<T>? {
+        var retryCount = requestRetryMechanism!!.retryCount
+
+        while (retryCount-- > 0) {
+            Log.d(TAG, "$type: remaining attempts :$retryCount")
+            val response = requestBlock()
+            Log.d(TAG, "$type: response :$response")
+
+            if (response != null) {
+                if (response.exception == null || requestRetryMechanism.retryOnExceptions.none {
+                        it.isInstance(
+                            response.exception
+                        )
+                    }) {
+                    if (response.code != null && response.code !in requestRetryMechanism.retryOnCode.range) {
+                        return response
+                    }
+                }
+            }
+
+            if (retryCount == 0 && response != null) {
+                Log.e(TAG, "$type: maximum attempts exceeded.")
+                return response
+            }
+
+            delay(requestRetryMechanism.retryDelay)
+        }
+
+        return null
     }
 
     /**
@@ -335,6 +452,7 @@ class ZHttpClient private constructor(builder: Builder) {
             Header("Content-Type", "application/json")
         )
         private var filesBufferSize = 1024
+        private var requestRetryMechanism: RequestRetryMechanism? = null
 
         /**
          * Set the base URL for the HTTP client.
@@ -427,6 +545,17 @@ class ZHttpClient private constructor(builder: Builder) {
         }
 
         /**
+         * Set the request retry mechanism for the HTTP client.
+         *
+         * @param requestRetryMechanism The authentication token to be set.
+         * @return This builder instance for method chaining.
+         */
+        fun requestRetryMechanism(requestRetryMechanism: RequestRetryMechanism): Builder {
+            this.requestRetryMechanism = requestRetryMechanism
+            return this
+        }
+
+        /**
          * Get the base URL configured in the builder.
          *
          * @return The base URL.
@@ -472,6 +601,15 @@ class ZHttpClient private constructor(builder: Builder) {
         }
 
         /**
+         * Get the request retry mechanism configured in the builder.
+         *
+         * @return The buffer size.
+         */
+        internal fun getRequestRetryMechanism(): RequestRetryMechanism? {
+            return requestRetryMechanism
+        }
+
+        /**
          * Build and return a new instance of ZHttpClient with the configured settings.
          *
          * @return A ZHttpClient instance.
@@ -479,5 +617,9 @@ class ZHttpClient private constructor(builder: Builder) {
         fun build(): ZHttpClient {
             return ZHttpClient(this)
         }
+    }
+
+    companion object {
+        const val TAG = "ZHttpClient"
     }
 }
