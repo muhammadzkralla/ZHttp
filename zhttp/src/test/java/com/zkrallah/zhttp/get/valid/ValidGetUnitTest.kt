@@ -1,4 +1,4 @@
-package com.zkrallah.zhttp
+package com.zkrallah.zhttp.get.valid
 
 import com.zkrallah.zhttp.client.ZHttpClient
 import com.zkrallah.zhttp.model.Complex
@@ -18,14 +18,14 @@ import kotlin.test.assertNull
  *
  * See [testing documentation](http://d.android.com/tools/testing).
  */
-class ExampleUnitTest {
+class ValidGetUnitTest {
     private lateinit var client: ZHttpClient
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
         val builder = ZHttpClient.Builder()
-            .baseUrl("http://192.168.1.7:8080")
+            .baseUrl("http://localhost:8080")
             .connectionTimeout(6000)
             .readTimeout(6000)
             .build()
