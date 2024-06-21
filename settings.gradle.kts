@@ -20,5 +20,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "ZHttp"
-include(":app")
 include(":zhttp")

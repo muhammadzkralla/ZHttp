@@ -1,4 +1,4 @@
-package com.zkrallah.zhttp
+package com.zkrallah.zhttp.get
 
 import com.zkrallah.zhttp.client.ZHttpClient
 import com.zkrallah.zhttp.model.Complex
@@ -13,19 +13,14 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-/**
- * Example local unit test, which will execute on the development machine (host).
- *
- * See [testing documentation](http://d.android.com/tools/testing).
- */
-class ExampleUnitTest {
+class ValidGetUnitTest {
     private lateinit var client: ZHttpClient
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
         val builder = ZHttpClient.Builder()
-            .baseUrl("http://192.168.1.7:8080")
+            .baseUrl("http://localhost:8080")
             .connectionTimeout(6000)
             .readTimeout(6000)
             .build()
@@ -74,6 +69,29 @@ class ExampleUnitTest {
             assertEquals(expectedPost.userId, this?.userId)
             assertEquals(expectedPost.title, this?.title)
             assertEquals(expectedPost.body, this?.body)
+        }
+        assertEquals(200, response.code)
+    }
+
+    @Test
+    fun `test list request`() = runBlocking {
+        // Act
+        val response = client.get<List<Post>>("posts")
+
+        val post1 = Post(
+            id = 21,
+            userId = 1,
+            title = "Title",
+            body = "Random post body."
+        )
+
+        // Assert
+        assertNotNull(response)
+        with(response.body?.get(0)) {
+            assertEquals(post1.id, this?.id)
+            assertEquals(post1.userId, this?.userId)
+            assertEquals(post1.title, this?.title)
+            assertEquals(post1.body, this?.body)
         }
         assertEquals(200, response.code)
     }
@@ -153,7 +171,7 @@ class ExampleUnitTest {
     @Test
     fun `test map request`() = runBlocking {
         // Act
-        val response = client.get<String>("str")
+        val response = client.get<Map<Any, Any>>("map")
 
         // Assert
         assertNotNull(response)
