@@ -1,4 +1,4 @@
-package com.zkrallah.zhttp.get.valid
+package com.zkrallah.zhttp.get
 
 import com.zkrallah.zhttp.client.ZHttpClient
 import com.zkrallah.zhttp.model.Complex
@@ -13,11 +13,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-/**
- * Example local unit test, which will execute on the development machine (host).
- *
- * See [testing documentation](http://d.android.com/tools/testing).
- */
 class ValidGetUnitTest {
     private lateinit var client: ZHttpClient
 
