@@ -21,6 +21,7 @@ There are some useful settings you can customize in ZHttp. You can set default h
 • Supports both asynchronous and synchronous requests <br>
 • Handles serialization and deserialization <br>
 • Has cancellation strategy <br>
+• Has request-retry strategy <br>
 • Auto-injects Basic/Bearer authentication headers <br>
 • Highly customizable <br>
 • Supports `GET`, `POST`, `DELETE`, `PUT`, `PATCH`, and `MULTIPART` requests <br> <br>
@@ -148,6 +149,41 @@ val client = ZHttpClient.Builder()
             .filesBufferSize(8 * 1024)
             .authenticated(Bearer("token")) // Bearer auth
             .authenticated(Basic("foo", "bar")) // Basic auth
+            .build()
+
+```
+
+And you can specify a request-retry strategy, customizing when to retry a request, the number of retry attempts, and the interval between each attempt. <br>
+
+```kotlin
+// Setting the connection and the read time out periods to 20 seconds.
+// Assigning some default headers to be included in each request.
+// Setting the buffer size for file uploading in MULTIPART requests to 8 KB.
+val defaultHeaders = listOf(
+            Header("Content-Type", "application/json; charset=UTF-8"),
+            Header("Authorization", "Bearer $token")
+)
+
+val client = ZHttpClient.Builder()
+            .baseUrl(BASE_URL)
+            .connectionTimeout(20000)
+            .readTimeout(20000)
+            .defaultHeaders(defaultHeaders)
+            .filesBufferSize(8 * 1024)
+            .authenticated(Bearer("token")) // Bearer auth
+            .authenticated(Basic("foo", "bar")) // Basic auth
+            .requestRetryMechanism(
+                RequestRetryMechanism(
+                    retryCount = 5,
+                    retryDelay = 6000L,
+                    retryOnExceptions = listOf(
+                        NullPointerException::class,
+                        SocketTimeoutException::class,
+                        JsonParseException::class
+                    ),
+                    retryOnCode = HttpStatusInterval.SERVER_ERROR
+                )
+            )
             .build()
 
 ```
