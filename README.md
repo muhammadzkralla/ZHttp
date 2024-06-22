@@ -44,7 +44,7 @@ dependencyResolutionManagement {
 ```gradle
 // Add this dependency to your build.gradle.kts (module) :
 dependencies {
-      implementation("com.github.muhammadzkralla:ZHttp:2.4")
+      implementation("com.github.muhammadzkralla:ZHttp:2.6")
 }
 ```
 
