@@ -1,6 +1,5 @@
 package com.zkrallah.zhttp.core
 
-import android.util.Log
 import com.zkrallah.zhttp.client.ZHttpClient
 import com.zkrallah.zhttp.model.Header
 import com.zkrallah.zhttp.model.HttpResponse
@@ -85,14 +84,17 @@ class ZPatch(val client: ZHttpClient) {
                 }
             } catch (e: SocketTimeoutException) {
                 // If a socket timeout occurs, return an HttpResponse with the exception
-                Log.e(TAG, "doPatch: $e", e)
+                System.err.println("ZHttp: doPatch: $e")
                 return HttpResponse(exception = e)
             } catch (e: Exception) {
                 // If there's an error, read the error stream for additional information
-                Log.e(TAG, "doPatch: $e", e)
-                BufferedReader(InputStreamReader(connection.errorStream)).use { reader ->
-                    var line: String?
-                    while (reader.readLine().also { line = it } != null) response.append(line)
+                try {
+                    BufferedReader(InputStreamReader(connection.errorStream)).use { reader ->
+                        var line: String?
+                        while (reader.readLine().also { line = it } != null) response.append(line)
+                    }
+                } catch (e: Exception) {
+                    System.err.println("ZHttp: doPatch: $e. No error stream sent by the server")
                 }
             }
 
@@ -106,7 +108,7 @@ class ZPatch(val client: ZHttpClient) {
             )
         } catch (e: Exception) {
             // If an exception occurs, log the error and return an HttpResponse with the exception
-            Log.e(TAG, "doPatch: $e", e)
+            System.err.println("ZHttp: doPatch: $e")
             HttpResponse(exception = e)
         } finally {
             // Disconnect the connection when done
@@ -131,7 +133,7 @@ class ZPatch(val client: ZHttpClient) {
                 try {
                     doPatch(endpoint, requestBody, queries, headers)
                 } catch (e: Exception) {
-                    Log.e(TAG, "doSuspendedPatchRequest: $e", e)
+                    System.err.println("ZHttp: doSuspendedPatchRequest: $e")
                     val response = HttpResponse(exception = e)
                     response
                 }
@@ -155,7 +157,7 @@ class ZPatch(val client: ZHttpClient) {
             doSuspendedPatchRequest(endpoint, requestBody, queries, headers).await() ?: return null
 
         response.exception?.let {
-            Log.e("ZPatch", "processPatch: $it", it)
+            System.err.println("ZHttp: processPatch: $it")
         }
 
         val body = try {
@@ -226,7 +228,6 @@ class ZPatch(val client: ZHttpClient) {
     }
 
     companion object {
-        private const val TAG = "ZPatch"
         private const val PATCH = "PATCH"
     }
 }

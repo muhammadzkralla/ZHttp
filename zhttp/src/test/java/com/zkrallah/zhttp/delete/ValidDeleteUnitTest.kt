@@ -2,7 +2,6 @@ package com.zkrallah.zhttp.delete
 
 import com.zkrallah.zhttp.client.ZHttpClient
 import com.zkrallah.zhttp.model.Post
-import com.zkrallah.zhttp.model.Query
 import io.mockk.MockKAnnotations
 import io.mockk.spyk
 import kotlinx.coroutines.runBlocking

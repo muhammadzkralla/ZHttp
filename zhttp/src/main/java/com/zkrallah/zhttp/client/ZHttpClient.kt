@@ -1,6 +1,5 @@
 package com.zkrallah.zhttp.client
 
-import android.util.Log
 import com.google.gson.Gson
 import com.zkrallah.zhttp.model.Basic
 import com.zkrallah.zhttp.model.Bearer
@@ -410,9 +409,9 @@ class ZHttpClient private constructor(builder: Builder) {
         var retryCount = requestRetryMechanism!!.retryCount
 
         while (retryCount-- > 0) {
-            Log.d(TAG, "$type: remaining attempts :$retryCount")
+            println("ZHttp: $type: remaining attempts :$retryCount")
             val response = requestBlock()
-            Log.d(TAG, "$type: response :$response")
+            println("ZHttp: $type: response :$response")
 
             if (response != null) {
                 if (response.exception == null || requestRetryMechanism.retryOnExceptions.none {
@@ -427,7 +426,7 @@ class ZHttpClient private constructor(builder: Builder) {
             }
 
             if (retryCount == 0 && response != null) {
-                Log.e(TAG, "$type: maximum attempts exceeded.")
+                System.err.println("ZHttp: $type: maximum attempts exceeded.")
                 return response
             }
 

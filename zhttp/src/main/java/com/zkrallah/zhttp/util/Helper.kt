@@ -1,6 +1,5 @@
 package com.zkrallah.zhttp.util
 
-import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.JsonParseException
 import com.google.gson.reflect.TypeToken
@@ -38,7 +37,7 @@ object Helper {
             if (T::class.java == String::class.java) body as T
             else throw JsonParseException("Failed to deserialize body.")
         } catch (e: Exception) {
-            Log.e("ZHttp", "deserializeBody: $e", e)
+            System.err.println("ZHttp: Failed to deserialize body : ${e.message}")
             throw JsonParseException("Failed to deserialize body.")
         }
     }
