@@ -120,10 +120,13 @@ class ZMultipart(val client: ZHttpClient) {
                 return HttpResponse(exception = e)
             } catch (e: Exception) {
                 // If there's an error, read the error stream for additional information
-                System.err.println("ZHttp: doMultipart: $e")
-                BufferedReader(InputStreamReader(connection.errorStream)).use { reader ->
-                    var line: String?
-                    while (reader.readLine().also { line = it } != null) response.append(line)
+                try {
+                    BufferedReader(InputStreamReader(connection.errorStream)).use { reader ->
+                        var line: String?
+                        while (reader.readLine().also { line = it } != null) response.append(line)
+                    }
+                } catch (e: Exception) {
+                    System.err.println("ZHttp: doMultipart: $e. No error stream sent by the server")
                 }
             }
 
