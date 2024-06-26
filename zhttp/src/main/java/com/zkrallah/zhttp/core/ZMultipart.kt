@@ -1,6 +1,5 @@
 package com.zkrallah.zhttp.core
 
-import android.util.Log
 import com.zkrallah.zhttp.client.ZHttpClient
 import com.zkrallah.zhttp.model.Header
 import com.zkrallah.zhttp.model.HttpResponse
@@ -117,11 +116,11 @@ class ZMultipart(val client: ZHttpClient) {
                 }
             } catch (e: SocketTimeoutException) {
                 // If a socket timeout occurs, return an HttpResponse with the exception
-                Log.e(TAG, "doMultipart: $e", e)
+                System.err.println("ZHttp: doMultipart: $e")
                 return HttpResponse(exception = e)
             } catch (e: Exception) {
                 // If there's an error, read the error stream for additional information
-                Log.e(TAG, "doMultipart: $e", e)
+                System.err.println("ZHttp: doMultipart: $e")
                 BufferedReader(InputStreamReader(connection.errorStream)).use { reader ->
                     var line: String?
                     while (reader.readLine().also { line = it } != null) response.append(line)
@@ -138,7 +137,7 @@ class ZMultipart(val client: ZHttpClient) {
             )
         } catch (e: Exception) {
             // If an exception occurs, log the error and return an HttpResponse with the exception
-            Log.e(TAG, "doMultipart: $e", e)
+            System.err.println("ZHttp: doMultipart: $e")
             HttpResponse(exception = e)
         } finally {
             // Disconnect the connection when done
@@ -163,7 +162,7 @@ class ZMultipart(val client: ZHttpClient) {
                 try {
                     doMultipart(endpoint, parts, queries, headers)
                 } catch (e: Exception) {
-                    Log.e(TAG, "doSuspendedMultipartRequest: $e", e)
+                    System.err.println("ZHttp doSuspendedMultipartRequest: $e")
                     val response = HttpResponse(exception = e)
                     response
                 }
@@ -187,7 +186,7 @@ class ZMultipart(val client: ZHttpClient) {
             doSuspendedMultipartRequest(endpoint, parts, queries, headers).await() ?: return null
 
         response.exception?.let {
-            Log.e("ZMultipart", "processMultiPart: $it", it)
+            System.err.println("ZHttp: processMultiPart: $it")
         }
 
         val body = try {
@@ -258,7 +257,6 @@ class ZMultipart(val client: ZHttpClient) {
     }
 
     companion object {
-        private const val TAG = "ZMultipart"
         private const val POST = "POST"
         private const val BOUNDARY = "*****"
     }

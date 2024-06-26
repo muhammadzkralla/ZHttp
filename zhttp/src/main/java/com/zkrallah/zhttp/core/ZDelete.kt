@@ -1,6 +1,5 @@
 package com.zkrallah.zhttp.core
 
-import android.util.Log
 import com.zkrallah.zhttp.client.ZHttpClient
 import com.zkrallah.zhttp.model.Header
 import com.zkrallah.zhttp.model.HttpResponse
@@ -74,11 +73,11 @@ class ZDelete(val client: ZHttpClient) {
                 }
             } catch (e: SocketTimeoutException) {
                 // If a socket timeout occurs, return an HttpResponse with the exception
-                Log.e(TAG, "doDelete: $e", e)
+                System.err.println("ZHttp: doDelete: $e")
                 return HttpResponse(exception = e)
             } catch (e: Exception) {
                 // If there's an error, read the error stream for additional information
-                Log.e(TAG, "doDelete: $e", e)
+                System.err.println("ZHttp: doDelete: $e")
                 BufferedReader(InputStreamReader(connection.errorStream)).use { reader ->
                     var line: String?
                     while (reader.readLine().also { line = it } != null) response.append(line)
@@ -95,7 +94,7 @@ class ZDelete(val client: ZHttpClient) {
             )
         } catch (e: Exception) {
             // If an exception occurs, log the error and return an HttpResponse with the exception
-            Log.e(TAG, "doDelete: $e", e)
+            System.err.println("ZHttp: doDelete: $e")
             HttpResponse(exception = e)
         } finally {
             // Disconnect the connection when done
@@ -119,7 +118,7 @@ class ZDelete(val client: ZHttpClient) {
                 try {
                     doDelete(endpoint, queries, headers)
                 } catch (e: Exception) {
-                    Log.e(TAG, "doSuspendedDeleteRequest: $e", e)
+                    System.err.println("ZHttp: doSuspendedDeleteRequest: $e")
                     val response = HttpResponse(exception = e)
                     response
                 }
@@ -141,7 +140,7 @@ class ZDelete(val client: ZHttpClient) {
         val response = doSuspendedDeleteRequest(endpoint, queries, headers).await() ?: return null
 
         response.exception?.let {
-            Log.e("ZDelete", "processDelete: $it", it)
+            System.err.println("ZHttp: processDelete: $it")
         }
 
         val body = try {
@@ -210,7 +209,6 @@ class ZDelete(val client: ZHttpClient) {
     }
 
     companion object {
-        private const val TAG = "ZDelete"
         private const val DELETE = "DELETE"
     }
 }

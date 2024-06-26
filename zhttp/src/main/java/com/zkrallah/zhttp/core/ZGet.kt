@@ -1,6 +1,5 @@
 package com.zkrallah.zhttp.core
 
-import android.util.Log
 import com.zkrallah.zhttp.client.ZHttpClient
 import com.zkrallah.zhttp.model.Header
 import com.zkrallah.zhttp.model.HttpResponse
@@ -74,11 +73,11 @@ class ZGet(val client: ZHttpClient) {
                 }
             } catch (e: SocketTimeoutException) {
                 // If a socket timeout occurs, return an HttpResponse with the exception
-                Log.e(TAG, "doGet: $e", e)
+                System.err.println("ZHttp: doGet: $e")
                 return HttpResponse(exception = e)
             } catch (e: Exception) {
                 // If there's an error, read the error stream for additional information
-                Log.e(TAG, "doGet: $e", e)
+                System.err.println("ZHttp: doGet: $e")
                 BufferedReader(InputStreamReader(connection.errorStream)).use { reader ->
                     var line: String?
                     while (reader.readLine().also { line = it } != null) response.append(line)
@@ -95,7 +94,7 @@ class ZGet(val client: ZHttpClient) {
             )
         } catch (e: Exception) {
             // If an exception occurs, log the error and return an HttpResponse with the exception
-            Log.e(TAG, "doGet: $e", e)
+            System.err.println("ZHttp: doGet: $e")
             HttpResponse(exception = e)
         } finally {
             // Disconnect the connection when done
@@ -119,7 +118,7 @@ class ZGet(val client: ZHttpClient) {
                 try {
                     doGet(endpoint, queries, headers)
                 } catch (e: Exception) {
-                    Log.e(TAG, "doSuspendedGetRequest: $e", e)
+                    System.err.println("ZHttp: doSuspendedGetRequest: $e")
                     val response = HttpResponse(exception = e)
                     response
                 }
@@ -141,7 +140,7 @@ class ZGet(val client: ZHttpClient) {
         val response = doSuspendedGetRequest(endpoint, queries, headers).await() ?: return null
 
         response.exception?.let {
-            Log.e("ZGet", "processGet: $it", it)
+            System.err.println("ZHttp: processGet: $it")
         }
 
         val body = try {
@@ -210,7 +209,6 @@ class ZGet(val client: ZHttpClient) {
     }
 
     companion object {
-        private const val TAG = "ZGet"
         private const val GET = "GET"
     }
 
