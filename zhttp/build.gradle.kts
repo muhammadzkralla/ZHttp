@@ -41,22 +41,26 @@ dependencies {
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0")
 }
 
-val jar by tasks.creating(Jar::class) {
-    archiveClassifier.set("jvm")
-    from(android.sourceSets.getByName("main").java.srcDirs)
-}
-
 afterEvaluate {
     publishing {
         publications {
             create<MavenPublication>("mavenJava") {
+                // Publishing AAR for Android consumers
                 from(components["release"])
-                groupId = "com.github.muhammadzkralla"
                 artifactId = "zhttp"
                 version = "1.0.0"
+                groupId = "com.github.muhammadzkralla"
 
-                artifact(tasks.getByName("bundleReleaseAar"))
-                artifact(jar)
+                // Define the AAR artifact
+                artifact(tasks.getByName("bundleReleaseAar")) {
+                    classifier = "aar" // Set classifier to avoid conflicts
+                }
+
+                // Define the JAR artifact for JVM consumers
+                artifact(tasks.create<Jar>("jvmJar") {
+                    archiveClassifier.set("jvm") // Use a different classifier
+                    from(android.sourceSets.getByName("main").java.srcDirs)
+                })
             }
         }
     }
