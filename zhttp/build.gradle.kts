@@ -41,6 +41,11 @@ dependencies {
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0")
 }
 
+val jar by tasks.creating(Jar::class) {
+    archiveClassifier.set("jvm")
+    from(android.sourceSets.getByName("main").java.srcDirs)
+}
+
 afterEvaluate {
     publishing {
         publications {
@@ -49,6 +54,9 @@ afterEvaluate {
                 groupId = "com.github.muhammadzkralla"
                 artifactId = "zhttp"
                 version = "1.0.0"
+
+                artifact(tasks.getByName("bundleReleaseAar"))
+                artifact(jar)
             }
         }
     }
