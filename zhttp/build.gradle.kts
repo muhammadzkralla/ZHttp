@@ -48,7 +48,7 @@ afterEvaluate {
             create<MavenPublication>("androidRelease") {
                 groupId = "com.github.muhammadzkralla"
                 artifactId = "zhttp"
-                version = "2.8.5"
+                version = "2.8.6"
 
                 // Publishing AAR for Android consumers
                 from(components["release"])
@@ -58,16 +58,9 @@ afterEvaluate {
             create<MavenPublication>("jvmJar") {
                 groupId = "com.github.muhammadzkralla"
                 artifactId = "zhttp-jvm"
-                version = "2.8.5"
+                version = "2.8.6"
 
-                // Define a separate task for the JVM JAR
-                val jvmJar = tasks.create<Jar>("createJvmJar") {
-                    archiveClassifier.set("jvm")
-                    from(android.sourceSets["main"].java.srcDirs) // Use srcDirs for Kotlin/Java
-                }
-
-                // Use the created task as the artifact
-                artifact(jvmJar)
+                from(components["release"])
             }
         }
     }
