@@ -48,7 +48,7 @@ afterEvaluate {
             create<MavenPublication>("androidRelease") {
                 groupId = "com.github.muhammadzkralla"
                 artifactId = "zhttp"
-                version = "2.8.3"
+                version = "2.8.4"
 
                 // Publishing AAR for Android consumers
                 from(components["release"])
@@ -57,8 +57,8 @@ afterEvaluate {
             // JVM JAR Publication
             create<MavenPublication>("jvmJar") {
                 groupId = "com.github.muhammadzkralla"
-                artifactId = "zhttp"
-                version = "2.8.3"
+                artifactId = "zhttp-jvm"
+                version = "2.8.4"
 
                 // Define the JAR artifact for JVM consumers
                 artifact(tasks.create<Jar>("createJvmJar") {
