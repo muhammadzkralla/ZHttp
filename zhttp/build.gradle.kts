@@ -44,22 +44,27 @@ dependencies {
 afterEvaluate {
     publishing {
         publications {
-            create<MavenPublication>("mavenJava") {
+            // Android AAR Publication
+            create<MavenPublication>("androidRelease") {
+                groupId = "com.github.muhammadzkralla"
+                artifactId = "zhttp"
+                version = "2.8.2"
+
                 // Publishing AAR for Android consumers
                 from(components["release"])
-                artifactId = "zhttp"
-                version = "1.0.0"
-                groupId = "com.github.muhammadzkralla"
+            }
 
-                // Define the AAR artifact
-                artifact(tasks.getByName("bundleReleaseAar")) {
-                    classifier = "aar" // Set classifier to avoid conflicts
-                }
+            // JVM JAR Publication
+            create<MavenPublication>("jvmJar") {
+                groupId = "com.github.muhammadzkralla"
+                artifactId = "zhttp"
+                version = "2.8.2"
 
                 // Define the JAR artifact for JVM consumers
-                artifact(tasks.create<Jar>("jvmJar") {
-                    archiveClassifier.set("jvm") // Use a different classifier
+                artifact(tasks.create<Jar>("createJvmJar") {
+                    archiveClassifier.set("jvm")
                     from(android.sourceSets.getByName("main").java.srcDirs)
+                    from("src/main/java") // Ensure Java files are included
                 })
             }
         }
