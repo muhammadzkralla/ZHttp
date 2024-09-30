@@ -28,11 +28,7 @@ publishing {
 
             groupId = "com.github.muhammadzkralla"
             artifactId = "zhttp-jvm"
-            version = "2.8.7"
+            version = "2.8.8"
         }
     }
-}
-
-tasks.withType<Test> {
-    useJUnitPlatform() // Enables JUnit 5 if you’re using it
 }
