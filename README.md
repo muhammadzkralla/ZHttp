@@ -48,7 +48,7 @@ dependencyResolutionManagement {
 ```gradle
 // Add this dependency to your build.gradle.kts (module) :
 dependencies {
-      implementation("com.github.muhammadzkralla:ZHttp:2.8.7")
+      implementation("com.github.muhammadzkralla:ZHttp:2.8.8")
 }
 ```
 
@@ -69,7 +69,7 @@ If you are using `Maven` :
 <dependency>
 	<groupId>com.github.muhammadzkralla</groupId>
 	<artifactId>ZHttp</artifactId>
-	<version>2.8.7</version>
+	<version>2.8.8</version>
 </dependency>
 ```
 
@@ -547,7 +547,7 @@ To make a synchronous `MULTIPART` request using ZHttp, here's an example of the 
 val response = ZMultipart(client).doMultipart(END_POINT, PARTS, QUERIES, HEADERS)
 ```
 
-ZHttp supports both HTTP and HTTPS websites. To enable communication with HTTP websites,
+ZHttp supports both HTTP and HTTPS websites. To enable communication with HTTP websites for Android,
 you can add the following attribute to your AndroidManifest.xml file:
 ```xml
 <application
