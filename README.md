@@ -2,33 +2,37 @@
 
 ## Introduction
 
-ZHttp is a Kotlin-based HTTP Client Library offering various use cases. I've abstracted away all the technical 
+ZHttp is a Kotlin-based HTTP Client Library offering various use cases. I've abstracted away all the technical
 details of making an asynchronous HTTP request, making it very easy to use and beginner-friendly. <br><br>
-This does not mean that you cannot customize your request. In fact, you can ignore all my threading and serialization/deserialization 
+This does not mean that you cannot customize your request. In fact, you can ignore all my threading and serialization/deserialization
 logic and make a completely raw request, where you can handle reactive programming and the deserialization process.
 In manual mode, you take complete control over the whole process. <br> <br>
 ZHttp is not built on any high-level or low-level networking or threading libraries.
 The only third-party library used is Google's `Gson` library for serialization/deserialization. <br><br>
-There are some useful settings you can customize in ZHttp. You can set default headers, connection and read time out periods, and buffer size for uploading files. 
+There are some useful settings you can customize in ZHttp. You can set default headers, connection and read time out periods, and buffer size for uploading files.
 
 • Refer to this [Demo](https://github.com/muhammadzkralla/ZHttp_Demo "Demo") for a simple example. <br>
 • Refer to this [Demo](https://github.com/muhammadzkralla/Z-Students "Demo") for an actual app example.
 
 ## Features
 
-• Beginner-friendly & simple to use <br>
-• Thread-safe & type-safe <br>
-• Supports both asynchronous and synchronous requests <br>
-• Handles serialization and deserialization <br>
-• Has cancellation strategy <br>
-• Has request-retry strategy <br>
-• Auto-injects Basic/Bearer authentication headers <br>
-• Highly customizable <br>
-• Supports `GET`, `POST`, `DELETE`, `PUT`, `PATCH`, and `MULTIPART` requests <br> <br>
+• Supports all JVM projects like Android, Spring Boot, console apps, etc ✅<br>
+• Beginner-friendly & simple to use ✅<br>
+• Thread-safe & type-safe ✅<br>
+• Supports both asynchronous and synchronous requests ✅<br>
+• Leverages Kotlin Coroutines for callback or suspended requests ✅<br>
+• Handles serialization and deserialization ✅<br>
+• Has cancellation strategy ✅<br>
+• Has request-retry strategy ✅<br>
+• Auto-injects Basic/Bearer authentication headers ✅<br>
+• Highly customizable ✅<br>
+• Supports `GET`, `POST`, `DELETE`, `PUT`, `PATCH`, and `MULTIPART` requests ✅<br> <br>
 
 ## Installation
 
-To start using ZHttp, you should add the dependencies to your project :
+To start using ZHttp, you should add the dependencies to your project : <br>
+
+If you are using `Gradle` :
 
 ```gradle
 // Add this part to your settings.gradle.kts :
@@ -44,10 +48,30 @@ dependencyResolutionManagement {
 ```gradle
 // Add this dependency to your build.gradle.kts (module) :
 dependencies {
-      implementation("com.github.muhammadzkralla:ZHttp:2.6")
+      implementation("com.github.muhammadzkralla:ZHttp:2.8.7")
 }
 ```
 
+If you are using `Maven` :
+
+```xml
+<!-- Add this part to the repositories in pom.xml : -->
+<repositories>
+	<repository>
+		<id>jitpack.io</id>
+		<url>https://jitpack.io</url>
+	</repository>
+</repositories>
+```
+
+```xml
+<!-- Add this to the dependencies in pom.xml : -->
+<dependency>
+	<groupId>com.github.muhammadzkralla</groupId>
+	<artifactId>ZHttp</artifactId>
+	<version>2.8.7</version>
+</dependency>
+```
 
 ## How to use
 As stated above, ZHttp supports the `GET`, `POST`, `DELETE`, `PUT`, `PATCH`, and `MULTIPART` requests. We will illustrate how to use each one of them below.
@@ -527,9 +551,7 @@ ZHttp supports both HTTP and HTTPS websites. To enable communication with HTTP w
 you can add the following attribute to your AndroidManifest.xml file:
 ```xml
 <application
-    ...
     android:usesCleartextTraffic="true">
-    ...
 </application>
 ```
 
