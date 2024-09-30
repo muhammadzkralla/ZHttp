@@ -1,51 +1,38 @@
 plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.jetbrains.kotlin.android)
+    kotlin("jvm") version "1.9.0" // Or your preferred Kotlin version
     id("maven-publish")
-}
-
-android {
-    namespace = "com.zkrallah.zhttp"
-    compileSdk = 34
-
-    defaultConfig {
-        minSdk = 26
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
-    }
-
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
 }
 
 dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.2")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.9.22")
+    testImplementation("io.mockk:mockk:1.12.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0")
 }
 
-afterEvaluate {
-    publishing {
-        publications {
-            create<MavenPublication>("mavenJava") {
-                from(components["release"])
-                groupId = "com.github.muhammadzkralla"
-                artifactId = "zhttp"
-                version = "1.0.0"
-            }
+java {
+    // Ensure compatibility with JVM 1.8
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+kotlin {
+    jvmToolchain(8) // JVM target 1.8
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"]) // Use the java component to publish JAR
+
+            groupId = "com.github.muhammadzkralla"
+            artifactId = "zhttp-jvm"
+            version = "2.8.7"
         }
     }
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform() // Enables JUnit 5 if you’re using it
 }

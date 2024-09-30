@@ -102,7 +102,7 @@ val client = ZHttpClient.Builder()
 
 ```
 
-You can also specify the connection and the read time out periods : <br>
+You can also specify the connection and the read time out periods : <br> 
 
 ```kotlin
 // Setting the connection and the read time out periods to 20 seconds.
@@ -114,7 +114,7 @@ val client = ZHttpClient.Builder()
 
 ```
 
-You can also add some default headers, these headers will be automatically included on each request made with this client instance : <br>
+You can also add some default headers, these headers will be automatically included on each request made with this client instance : <br> 
 
 ```kotlin
 // Setting the connection and the read time out periods to 20 seconds.
@@ -133,7 +133,7 @@ val client = ZHttpClient.Builder()
 
 ```
 
-You can also specify the buffer size for file uploading in `MULTIPART` requests : <br>
+You can also specify the buffer size for file uploading in `MULTIPART` requests : <br> 
 
 ```kotlin
 // Setting the connection and the read time out periods to 20 seconds.
@@ -154,7 +154,7 @@ val client = ZHttpClient.Builder()
 
 ```
 
-You can also specify authentication headers to automatically inject them into each request with the client : <br>
+You can also specify authentication headers to automatically inject them into each request with the client : <br> 
 
 ```kotlin
 // Setting the connection and the read time out periods to 20 seconds.
@@ -248,7 +248,7 @@ response headers, permissions, and exceptions of the HTTP request.
 
 > **IMPORTANT:** `TYPE` is generic, that means that it can be of type string, data class, list of objects, map of any object to any object..etc It's totally type-safe.
 
-> **Note:**
+> **Note:** 
 > `QUERIES`, `HEADERS` arguments can be `null` but, if you want to add `HEADERS` or `QUERIES` to the request :
 
 ```kotlin
@@ -293,7 +293,7 @@ val response = client.post<TYPE>(ENDPOINT, BODY, QUERIES, HEADERS)
 
 It will return you a `response` of the specified `TYPE`
 
-> **IMPORTANT:** `BODY` is generic, that means that it can be a string, data class object, list of objects, map of any object to any object..etc It's totally type-safe.
+> **IMPORTANT:** `BODY` is generic, that means that it can be a string, data class object, list of objects, map of any object to any object..etc It's totally type-safe. 
 
 <h1 align = "center"> Asynchronous Lambda POST </h1> <br>
 
@@ -306,7 +306,7 @@ val postRequest = client.post<TYPE>(ENDPOINT, BODY, QUERIES, HEADERS) { success,
 }
 ```
 
-> **Note:** `HEADERS`, `QUERIES`, `TYPE`, logging messages, and cancellation strategy follow the same rules as in the `GET` request.
+> **Note:** `HEADERS`, `QUERIES`, `TYPE`, logging messages, and cancellation strategy follow the same rules as in the `GET` request. 
 
 <h1 align = "center"> Asynchronous Coroutine DELETE </h1> <br>
 
@@ -330,7 +330,7 @@ val deleteRequest = client.delete<TYPE>(ENDPOINT, QUERIES, HEADERS) { success, f
 }
 ```
 
-> **Note:** `HEADERS`, `QUERIES`, `TYPE`, logging messages, and cancellation strategy follow the same rules as in the `GET` request.
+> **Note:** `HEADERS`, `QUERIES`, `TYPE`, logging messages, and cancellation strategy follow the same rules as in the `GET` request. 
 
 <h1 align = "center"> Asynchronous Coroutine PUT </h1> <br>
 
@@ -354,7 +354,7 @@ client.put<TYPE>(ENDPOINT, BODY, QUERIES, HEADERS) { success, failure ->
 }
 ```
 
-> **IMPORTANT:** `BODY` is generic, that means that it can be a string, data class object, list of objects, map of any object to any object..etc It's totally type-safe.
+> **IMPORTANT:** `BODY` is generic, that means that it can be a string, data class object, list of objects, map of any object to any object..etc It's totally type-safe. 
 
 > **Note:** `HEADERS`, `QUERIES`, `TYPE`, logging messages, and cancellation strategy follow the same rules as in the `GET` request.
 
@@ -466,13 +466,13 @@ val badMultiPartBody = MultipartBody(
 )
 ```
 
-> As `MultipartBody` is designed to contain the data of only one part, either an object, or a file.
+> As `MultipartBody` is designed to contain the data of only one part, either an object, or a file. 
 
 <h1 align = "center">  Manual Mode </h1> <br>
 
-As stated earlier, ZHttp is engineered for all developers, not just beginners, as it supports full customization for your HTTP request.
-The manual mode is designed to make you take complete control over your HTTP request. <br> <br> The request made with manual mode is just
-like using a manual car, you specify everything. You must handle the threading yourself using for example: Kotlin Coroutines / RxJava / AsyncTasks..etc
+As stated earlier, ZHttp is engineered for all developers, not just beginners, as it supports full customization for your HTTP request. 
+The manual mode is designed to make you take complete control over your HTTP request. <br> <br> The request made with manual mode is just 
+like using a manual car, you specify everything. You must handle the threading yourself using for example: Kotlin Coroutines / RxJava / AsyncTasks..etc 
 and handle the response deserialization. <br> <br>
 An instance of the client is required in the manual mode as the base url, connection / read time out periods, default headers, and buffer size values are applied to the synchronous request too.
 
@@ -552,7 +552,7 @@ you can add the following attribute to your AndroidManifest.xml file:
 ```xml
 <application
     android:usesCleartextTraffic="true">
-    </application>
+</application>
 ```
 
 > **Note:** Please note that while this configuration allows communication with HTTP websites,
