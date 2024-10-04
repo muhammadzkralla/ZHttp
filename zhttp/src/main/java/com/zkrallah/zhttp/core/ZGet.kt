@@ -73,7 +73,7 @@ class ZGet(val client: ZHttpClient) {
                 }
             } catch (e: SocketTimeoutException) {
                 // If a socket timeout occurs, return an HttpResponse with the exception
-                System.err.println("ZHttp: doGet: $e")
+                if (client.allowLogging) System.err.println("ZHttp: doGet: $e")
                 return HttpResponse(exception = e)
             } catch (e: Exception) {
                 // If there's an error, read the error stream for additional information
@@ -83,7 +83,8 @@ class ZGet(val client: ZHttpClient) {
                         while (reader.readLine().also { line = it } != null) response.append(line)
                     }
                 } catch (e: Exception) {
-                    System.err.println("ZHttp: doGet: $e. No error stream sent by the server")
+                    if (client.allowLogging) System.err.println("ZHttp: doGet: $e. No error stream sent by the server")
+                    return HttpResponse(exception = e)
                 }
             }
 
@@ -97,7 +98,7 @@ class ZGet(val client: ZHttpClient) {
             )
         } catch (e: Exception) {
             // If an exception occurs, log the error and return an HttpResponse with the exception
-            System.err.println("ZHttp: doGet: $e")
+            if (client.allowLogging) System.err.println("ZHttp: doGet: $e")
             HttpResponse(exception = e)
         } finally {
             // Disconnect the connection when done
@@ -121,7 +122,7 @@ class ZGet(val client: ZHttpClient) {
                 try {
                     doGet(endpoint, queries, headers)
                 } catch (e: Exception) {
-                    System.err.println("ZHttp: doSuspendedGetRequest: $e")
+                    if (client.allowLogging) System.err.println("ZHttp: doSuspendedGetRequest: $e")
                     val response = HttpResponse(exception = e)
                     response
                 }
@@ -143,7 +144,7 @@ class ZGet(val client: ZHttpClient) {
         val response = doSuspendedGetRequest(endpoint, queries, headers).await() ?: return null
 
         response.exception?.let {
-            System.err.println("ZHttp: processGet: $it")
+            if (client.allowLogging) System.err.println("ZHttp: processGet: $it")
         }
 
         val body = try {
