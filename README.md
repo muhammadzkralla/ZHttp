@@ -48,7 +48,7 @@ dependencyResolutionManagement {
 ```gradle
 // Add this dependency to your build.gradle.kts (module) :
 dependencies {
-      implementation("com.github.muhammadzkralla:ZHttp:2.8.8")
+      implementation("com.github.muhammadzkralla:ZHttp:2.8.9")
 }
 ```
 
@@ -69,7 +69,7 @@ If you are using `Maven` :
 <dependency>
 	<groupId>com.github.muhammadzkralla</groupId>
 	<artifactId>ZHttp</artifactId>
-	<version>2.8.8</version>
+	<version>2.8.9</version>
 </dependency>
 ```
 
@@ -102,7 +102,7 @@ val client = ZHttpClient.Builder()
 
 ```
 
-You can also specify the connection and the read time out periods : <br> 
+You can also specify the connection and the read time out periods and allow logging in console : <br> 
 
 ```kotlin
 // Setting the connection and the read time out periods to 20 seconds.
@@ -110,9 +110,12 @@ val client = ZHttpClient.Builder()
             .baseUrl(BASE_URL)
             .connectionTimeout(20000)
             .readTimeout(20000)
+            .allowLogging(true)
             .build()
 
 ```
+> **Note:**
+> There's no logger configured for now. Logging is just `println()` and `System.err.println()` for now until adding a logger for all platforms, and it's disabled by default.
 
 You can also add some default headers, these headers will be automatically included on each request made with this client instance : <br> 
 
