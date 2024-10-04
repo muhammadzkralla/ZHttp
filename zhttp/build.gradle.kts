@@ -28,7 +28,7 @@ publishing {
 
             groupId = "com.github.muhammadzkralla"
             artifactId = "zhttp-jvm"
-            version = "2.8.8"
+            version = "2.8.9"
         }
     }
 }

@@ -33,6 +33,7 @@ class ZHttpClient private constructor(builder: Builder) {
     private val filesBufferSize = builder.getBufferSize()
     private val gson = Gson()
     val requestRetryMechanism = builder.getRequestRetryMechanism()
+    var allowLogging = builder.getAllowLogging()
 
     /**
      * Get the base URL of the client.
@@ -409,9 +410,9 @@ class ZHttpClient private constructor(builder: Builder) {
         var retryCount = requestRetryMechanism!!.retryCount
 
         while (retryCount-- > 0) {
-            println("ZHttp: $type: remaining attempts :$retryCount")
+            if (allowLogging) println("ZHttp: $type: remaining attempts :$retryCount")
             val response = requestBlock()
-            println("ZHttp: $type: response :$response")
+            if (allowLogging) println("ZHttp: $type: response :$response")
 
             if (response != null) {
                 if (response.exception == null || requestRetryMechanism.retryOnExceptions.none {
@@ -426,7 +427,7 @@ class ZHttpClient private constructor(builder: Builder) {
             }
 
             if (retryCount == 0 && response != null) {
-                System.err.println("ZHttp: $type: maximum attempts exceeded.")
+                if (allowLogging) System.err.println("ZHttp: $type: maximum attempts exceeded.")
                 return response
             }
 
@@ -452,6 +453,7 @@ class ZHttpClient private constructor(builder: Builder) {
         )
         private var filesBufferSize = 1024
         private var requestRetryMechanism: RequestRetryMechanism? = null
+        private var allowLogging = false
 
         /**
          * Set the base URL for the HTTP client.
@@ -555,6 +557,17 @@ class ZHttpClient private constructor(builder: Builder) {
         }
 
         /**
+         * Set the logging status for the HTTP client.
+         *
+         * @param allowLogging The logging status to be set.
+         * @return This builder instance for method chaining.
+         */
+        fun allowLogging(allowLogging: Boolean): Builder {
+            this.allowLogging = allowLogging
+            return this
+        }
+
+        /**
          * Get the base URL configured in the builder.
          *
          * @return The base URL.
@@ -606,6 +619,15 @@ class ZHttpClient private constructor(builder: Builder) {
          */
         internal fun getRequestRetryMechanism(): RequestRetryMechanism? {
             return requestRetryMechanism
+        }
+
+        /**
+         * Get the logging status configured in the builder.
+         *
+         * @return The status.
+         */
+        internal fun getAllowLogging(): Boolean {
+            return allowLogging
         }
 
         /**

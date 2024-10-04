@@ -84,7 +84,7 @@ class ZPut(val client: ZHttpClient) {
                 }
             } catch (e: SocketTimeoutException) {
                 // If a socket timeout occurs, return an HttpResponse with the exception
-                System.err.println("ZHttp: doPut: $e")
+                if (client.allowLogging) System.err.println("ZHttp: doPut: $e")
                 return HttpResponse(exception = e)
             } catch (e: Exception) {
                 // If there's an error, read the error stream for additional information
@@ -94,7 +94,8 @@ class ZPut(val client: ZHttpClient) {
                         while (reader.readLine().also { line = it } != null) response.append(line)
                     }
                 } catch (e: Exception) {
-                    System.err.println("ZHttp: doPut: $e. No error stream sent by the server")
+                    if (client.allowLogging) System.err.println("ZHttp: doPut: $e. No error stream sent by the server")
+                    return HttpResponse(exception = e)
                 }
             }
 
@@ -108,7 +109,7 @@ class ZPut(val client: ZHttpClient) {
             )
         } catch (e: Exception) {
             // If an exception occurs, log the error and return an HttpResponse with the exception
-            System.err.println("ZHttp: doPut: $e")
+            if (client.allowLogging) System.err.println("ZHttp: doPut: $e")
             HttpResponse(exception = e)
         } finally {
             // Disconnect the connection when done
@@ -133,7 +134,7 @@ class ZPut(val client: ZHttpClient) {
                 try {
                     doPut(endpoint, requestBody, queries, headers)
                 } catch (e: Exception) {
-                    System.err.println("ZHttp: doSuspendedPutRequest: $e")
+                    if (client.allowLogging) System.err.println("ZHttp: doSuspendedPutRequest: $e")
                     val response = HttpResponse(exception = e)
                     response
                 }
@@ -157,7 +158,7 @@ class ZPut(val client: ZHttpClient) {
             doSuspendedPutRequest(endpoint, requestBody, queries, headers).await() ?: return null
 
         response.exception?.let {
-            System.err.println("ZHttp: processPut: $it")
+            if (client.allowLogging) System.err.println("ZHttp: processPut: $it")
         }
 
         val body = try {

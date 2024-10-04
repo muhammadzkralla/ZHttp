@@ -116,7 +116,7 @@ class ZMultipart(val client: ZHttpClient) {
                 }
             } catch (e: SocketTimeoutException) {
                 // If a socket timeout occurs, return an HttpResponse with the exception
-                System.err.println("ZHttp: doMultipart: $e")
+                if (client.allowLogging) System.err.println("ZHttp: doMultipart: $e")
                 return HttpResponse(exception = e)
             } catch (e: Exception) {
                 // If there's an error, read the error stream for additional information
@@ -126,7 +126,8 @@ class ZMultipart(val client: ZHttpClient) {
                         while (reader.readLine().also { line = it } != null) response.append(line)
                     }
                 } catch (e: Exception) {
-                    System.err.println("ZHttp: doMultipart: $e. No error stream sent by the server")
+                    if (client.allowLogging) System.err.println("ZHttp: doMultipart: $e. No error stream sent by the server")
+                    return HttpResponse(exception = e)
                 }
             }
 
@@ -140,7 +141,7 @@ class ZMultipart(val client: ZHttpClient) {
             )
         } catch (e: Exception) {
             // If an exception occurs, log the error and return an HttpResponse with the exception
-            System.err.println("ZHttp: doMultipart: $e")
+            if (client.allowLogging) System.err.println("ZHttp: doMultipart: $e")
             HttpResponse(exception = e)
         } finally {
             // Disconnect the connection when done
@@ -165,7 +166,7 @@ class ZMultipart(val client: ZHttpClient) {
                 try {
                     doMultipart(endpoint, parts, queries, headers)
                 } catch (e: Exception) {
-                    System.err.println("ZHttp doSuspendedMultipartRequest: $e")
+                    if (client.allowLogging) System.err.println("ZHttp doSuspendedMultipartRequest: $e")
                     val response = HttpResponse(exception = e)
                     response
                 }
@@ -189,7 +190,7 @@ class ZMultipart(val client: ZHttpClient) {
             doSuspendedMultipartRequest(endpoint, parts, queries, headers).await() ?: return null
 
         response.exception?.let {
-            System.err.println("ZHttp: processMultiPart: $it")
+            if (client.allowLogging) System.err.println("ZHttp: processMultiPart: $it")
         }
 
         val body = try {
