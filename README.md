@@ -3,30 +3,32 @@
 ## Introduction
 
 ZHttp is a Kotlin-based HTTP Client Library offering various use cases. I've abstracted away all the technical
-details of making an asynchronous HTTP request, making it very easy to use and beginner-friendly. <br><br>
+details of making an asynchronous (non-blocking) HTTP request, making it very easy to use and beginner-friendly. <br><br>
 This does not mean that you cannot customize your request. In fact, you can ignore all my threading and serialization/deserialization
-logic and make a completely raw request, where you can handle reactive programming and the deserialization process.
+logic and make a completely raw request, where you can handle reactive programming (blocking or non-blocking) and the deserialization process.
 In manual mode, you take complete control over the whole process. <br> <br>
 ZHttp is not built on any high-level or low-level networking or threading libraries.
 The only third-party library used is Google's `Gson` library for serialization/deserialization. <br><br>
 There are some useful settings you can customize in ZHttp. You can set default headers, connection and read time out periods, and buffer size for uploading files.
 
 • Refer to this [Demo](https://github.com/muhammadzkralla/ZHttp_Demo "Demo") for a simple example. <br>
-• Refer to this [Demo](https://github.com/muhammadzkralla/Z-Students "Demo") for an actual app example.
+• Refer to this [Demo](https://github.com/muhammadzkralla/Z-Students "Demo") for an actual app example. <br>
+
+Each feature is tested with some unit tests.
 
 ## Features
 
-• Supports all JVM projects like Android, Spring Boot, console apps, etc ✅<br>
-• Beginner-friendly & simple to use ✅<br>
-• Thread-safe & type-safe ✅<br>
-• Supports both asynchronous and synchronous requests ✅<br>
-• Leverages Kotlin Coroutines for callback or suspended requests ✅<br>
-• Handles serialization and deserialization ✅<br>
-• Has cancellation strategy ✅<br>
-• Has request-retry strategy ✅<br>
-• Auto-injects Basic/Bearer authentication headers ✅<br>
-• Highly customizable ✅<br>
-• Supports `GET`, `POST`, `DELETE`, `PUT`, `PATCH`, and `MULTIPART` requests ✅<br> <br>
+• Supports all JVM projects like Android, Spring Boot, console apps, etc. ✅<br>
+• Beginner-friendly & simple to use. ✅<br>
+• Thread-safe & type-safe. ✅<br>
+• Supports both asynchronous (non-blocking) and synchronous (blocking) requests. ✅<br>
+• Leverages Kotlin Coroutines for callback or suspended requests. ✅<br>
+• Handles serialization and deserialization. ✅<br>
+• Has cancellation strategy. ✅<br>
+• Has request-retry strategy. ✅<br>
+• Auto-injects Basic/Bearer authentication headers. ✅<br>
+• Highly customizable. ✅<br>
+• Supports `GET`, `POST`, `DELETE`, `PUT`, `PATCH`, and `MULTIPART` requests. ✅<br> <br>
 
 ## Installation
 
@@ -131,6 +133,7 @@ val client = ZHttpClient.Builder()
             .baseUrl(BASE_URL)
             .connectionTimeout(20000)
             .readTimeout(20000)
+            .allowLogging(true)
             .defaultHeaders(defaultHeaders)
             .build()
 
@@ -151,6 +154,7 @@ val client = ZHttpClient.Builder()
             .baseUrl(BASE_URL)
             .connectionTimeout(20000)
             .readTimeout(20000)
+            .allowLogging(true)
             .defaultHeaders(defaultHeaders)
             .filesBufferSize(8 * 1024)
             .build()
@@ -172,6 +176,7 @@ val client = ZHttpClient.Builder()
             .baseUrl(BASE_URL)
             .connectionTimeout(20000)
             .readTimeout(20000)
+            .allowLogging(true)
             .defaultHeaders(defaultHeaders)
             .filesBufferSize(8 * 1024)
             .authenticated(Bearer("token")) // Bearer auth
@@ -195,6 +200,7 @@ val client = ZHttpClient.Builder()
             .baseUrl(BASE_URL)
             .connectionTimeout(20000)
             .readTimeout(20000)
+            .allowLogging(true)
             .defaultHeaders(defaultHeaders)
             .filesBufferSize(8 * 1024)
             .authenticated(Bearer("token")) // Bearer auth
@@ -218,8 +224,11 @@ val client = ZHttpClient.Builder()
 > **Please Note That:** For each property of the above, there's a default value used if you do not specify them explicitly. <br> <br>
 > • baseUrl: is an empty string by default. <br>
 > • connectionTimeout & readTimeout: are 20 seconds by default. <br>
-> • defaultHeaders: is "Content-Type:application/json; charset=UTF-8" by default. <br>
-> • filesBufferSize: is 8 KB by default.
+> • allowLogging: is false by default. <br>
+> • defaultHeaders: are "Content-Type:application/json" by default. <br>
+> • filesBufferSize: is 8 KB by default. <br>
+> • authenticated: is null by default. <br>
+> • requestRetryMechanism: is null by default. <br>
 
 Finally, you can set the default headers after building the client by this function :
 
