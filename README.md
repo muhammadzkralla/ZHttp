@@ -4,12 +4,15 @@
 
 ZHttp is a Kotlin-based HTTP Client Library offering various use cases. I've abstracted away all the technical
 details of making an asynchronous (non-blocking) HTTP request, making it very easy to use and beginner-friendly. <br><br>
+
 This does not mean that you cannot customize your request. In fact, you can ignore all my threading and serialization/deserialization
 logic and make a completely raw request, where you can handle reactive programming (blocking or non-blocking) and the deserialization process.
 In manual mode, you take complete control over the whole process. <br> <br>
+
 ZHttp is not built on any high-level or low-level networking or threading libraries.
 The only third-party library used is Google's `Gson` library for serialization/deserialization. <br><br>
-There are some useful settings you can customize in ZHttp. You can set default headers, connection and read time out periods, and buffer size for uploading files.
+
+There are some useful settings you can customize in ZHttp. You can set default headers, connection and read time out periods, buffer size for uploading files, enable logging, intercept requests with auth headers, and create request retry mechanisms.
 
 • Refer to this [Demo](https://github.com/muhammadzkralla/ZHttp_Demo "Demo") for a simple example. <br>
 • Refer to this [Demo](https://github.com/muhammadzkralla/Z-Students "Demo") for an actual app example. <br>
